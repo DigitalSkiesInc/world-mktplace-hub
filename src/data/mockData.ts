@@ -18,7 +18,7 @@ export const mockProducts: Product[] = [
     description: 'Brand new iPhone 15 Pro Max, 256GB, Space Black. Never used, still in original packaging with all accessories.',
     price: 850,
     currency: 'WLD',
-    images: ['/src/assets/product-phone.jpg'],
+    images: ['/product-phone.jpg'],
     category: categories[0],
     condition: 'new',
     seller: {
@@ -40,7 +40,7 @@ export const mockProducts: Product[] = [
     description: 'Beautiful vintage Canon AE-1 35mm film camera in excellent working condition. Perfect for film photography enthusiasts.',
     price: 200,
     currency: 'WLD',
-    images: ['/src/assets/product-camera.jpg'],
+    images: ['/product-camera.jpg'],
     category: categories[0],
     condition: 'good',
     seller: {
@@ -62,7 +62,7 @@ export const mockProducts: Product[] = [
     description: 'Classic Air Jordan 1 in Chicago colorway. Size 10.5, worn a few times but in great condition. No box included.',
     price: 180,
     currency: 'WLD',
-    images: ['/src/assets/product-sneakers.jpg'],
+    images: ['/product-sneakers.jpg'],
     category: categories[1],
     condition: 'like-new',
     seller: {

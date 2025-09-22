@@ -22,7 +22,7 @@ export const BottomNavigation: React.FC = () => {
   ) => {
     if (disabledRoutes.includes(to)) {
       e.preventDefault(); // stop react-router from navigating
-      toast.info('Coming soon'); // show your message (toast, alert, modal, etc.)
+      toast.info('Coming soon',{ duration: 1000 }); // show your message (toast, alert, modal, etc.)
     }
   };
 
