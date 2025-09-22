@@ -11,7 +11,7 @@ const navItems = [
   { to: '/profile', icon: User, label: 'Profile' },
 ];
 
-const disabledRoutes = ['/categories','/chat', '/profile'];
+const disabledRoutes = ['/chat', '/profile'];
 
 export const BottomNavigation: React.FC = () => {
   const location = useLocation();
