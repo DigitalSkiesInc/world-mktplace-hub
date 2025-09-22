@@ -5,13 +5,29 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { WorldAppProvider } from "@/contexts/WorldAppContext";
 import { BottomNavigation } from "@/components/BottomNavigation";
+import { Outlet, Navigate } from "react-router-dom";
+import { useWorldApp } from '@/contexts/WorldAppContext';
 import Home from "./pages/Home";
 import Categories from "./pages/Categories";
 import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+
 
 const queryClient = new QueryClient();
+
+function ProtectedLayout() {
+  const { user, isLoading } = useWorldApp();
+  if (isLoading) return <p>Loading…</p>;
+  return user ? 
+  <div>
+      <Outlet />
+      <BottomNavigation />
+    </div>
+  : <Navigate to="/login" replace />;
+}
+
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -22,18 +38,22 @@ const App = () => (
         <BrowserRouter>
           <div className="min-h-screen bg-background">
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/categories" element={<Categories />} />
-              <Route path="/categories/:slug" element={<Categories />} />
-              <Route path="/chat" element={<Chat />} />
-              <Route path="/chat/:id" element={<Chat />} />
-              <Route path="/profile" element={<Profile />} />
+              {/* <Route path="/login" element={<Login />} /> */}
+              {/* <Route element={<ProtectedLayout />}> */}
+                <Route path="/" element={<Home />} />
+                <Route path="/categories" element={<Categories />} />
+                <Route path="/categories/:slug" element={<Categories />} />
+                {/* <Route path="/chat" element={<Chat />} /> */}
+                {/* <Route path="/chat/:id" element={<Chat />} /> */}
+                {/* <Route path="/profile" element={<Profile />} /> */}
+              {/* </Route> */}
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
             <BottomNavigation />
           </div>
         </BrowserRouter>
+  
       </TooltipProvider>
     </WorldAppProvider>
   </QueryClientProvider>

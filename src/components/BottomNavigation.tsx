@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Grid3X3, MessageCircle, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const navItems = [
   { to: '/', icon: Home, label: 'Home' },
@@ -10,8 +11,20 @@ const navItems = [
   { to: '/profile', icon: User, label: 'Profile' },
 ];
 
+const disabledRoutes = ['/categories','/chat', '/profile'];
+
 export const BottomNavigation: React.FC = () => {
   const location = useLocation();
+
+   const handleClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    to: string
+  ) => {
+    if (disabledRoutes.includes(to)) {
+      e.preventDefault(); // stop react-router from navigating
+      toast.info('Coming soon'); // show your message (toast, alert, modal, etc.)
+    }
+  };
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 safe-area-pb">
@@ -24,6 +37,7 @@ export const BottomNavigation: React.FC = () => {
             <NavLink
               key={to}
               to={to}
+              onClick={(e) => handleClick(e, to)}
               className={cn(
                 "flex flex-col items-center justify-center min-w-0 flex-1 py-1 px-2",
                 "transition-colors duration-200 rounded-lg",
