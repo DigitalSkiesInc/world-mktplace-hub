@@ -19,6 +19,7 @@ const Categories: React.FC = () => {
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   
   const currentCategory = categories?.find(c => c.slug === slug);
+
   
   const filters: ProductFilters = {
     categoryId: currentCategory?.id,
