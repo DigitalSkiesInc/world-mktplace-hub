@@ -1,30 +1,42 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Filter, Grid, List } from 'lucide-react';
+import { ArrowLeft, Filter, Grid, List, Search } from 'lucide-react';
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { categories, mockProducts } from '@/data/mockData';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useProducts, useCategories, ProductFilters } from '@/hooks/useProducts';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Categories: React.FC = () => {
   const { slug } = useParams();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [viewMode, setViewMode] = React.useState<'grid' | 'list'>('grid');
   const [selectedCondition, setSelectedCondition] = React.useState<string>('all');
+  const [sortBy, setSortBy] = React.useState<string>('newest');
 
-  const currentCategory = categories.find(c => c.slug === slug);
-  const filteredProducts = mockProducts.filter(product => {
-    const matchesCategory = !slug || product.category.slug === slug;
-    const matchesSearch = !searchQuery || 
-      product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCondition = selectedCondition === 'all' || product.condition === selectedCondition;
-    
-    return matchesCategory && matchesSearch && matchesCondition;
-  });
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  
+  const currentCategory = categories?.find(c => c.slug === slug);
+  
+  const filters: ProductFilters = {
+    categoryId: currentCategory?.id,
+    searchQuery: searchQuery || undefined,
+    condition: selectedCondition !== 'all' ? selectedCondition : undefined,
+    sortBy: sortBy as ProductFilters['sortBy'],
+  };
+  
+  const { data: products = [], isLoading: productsLoading } = useProducts(filters);
 
   const conditions = ['all', 'new', 'second-hand'];
+  const sortOptions = [
+    { value: 'newest', label: 'Newest First' },
+    { value: 'oldest', label: 'Oldest First' },
+    { value: 'price_asc', label: 'Price: Low to High' },
+    { value: 'price_desc', label: 'Price: High to Low' },
+    { value: 'rating_desc', label: 'Best Rated' },
+  ];
 
   return (
     <div className="pb-20">
@@ -65,15 +77,18 @@ const Categories: React.FC = () => {
           </div>
 
           {/* Search */}
-          <Input
-            placeholder="Search in this category..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="mb-3"
-          />
+          <div className="relative mb-3">
+            <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
 
           {/* Filters */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 mb-3">
             {conditions.map((condition) => (
               <Badge
                 key={condition}
@@ -85,6 +100,22 @@ const Categories: React.FC = () => {
               </Badge>
             ))}
           </div>
+
+          {/* Sort */}
+          <div className="mb-4">
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Sort by..." />
+              </SelectTrigger>
+              <SelectContent>
+                {sortOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -93,23 +124,31 @@ const Categories: React.FC = () => {
         {!slug && (
           <section className="mb-8">
             <h2 className="text-lg font-semibold text-foreground mb-4">Browse Categories</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {categories.map((category) => (
-                <Link
-                  key={category.id}
-                  to={`/categories/${category.slug}`}
-                  className="flex items-center gap-3 p-4 rounded-xl bg-card hover:bg-muted transition-colors shadow-card"
-                >
-                  <span className="text-3xl">{category.icon}</span>
-                  <div>
-                    <h3 className="font-medium text-foreground">{category.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {mockProducts.filter(p => p.category.id === category.id).length} items
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            {categoriesLoading ? (
+              <div className="grid grid-cols-2 gap-4">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Skeleton key={i} className="h-20 rounded-xl" />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                {categories?.map((category) => (
+                  <Link
+                    key={category.id}
+                    to={`/categories/${category.slug}`}
+                    className="flex items-center gap-3 p-4 rounded-xl bg-card hover:bg-muted transition-colors shadow-card"
+                  >
+                    <span className="text-3xl">{category.icon}</span>
+                    <div>
+                      <h3 className="font-medium text-foreground">{category.name}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Browse items
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </section>
         )}
 
@@ -118,7 +157,7 @@ const Categories: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-foreground">
               {currentCategory ? `${currentCategory.name} Products` : 'All Products'}
-              <span className="text-muted-foreground ml-2">({filteredProducts.length})</span>
+              <span className="text-muted-foreground ml-2">({products.length})</span>
             </h2>
             
             <Button variant="ghost" size="sm">
@@ -127,13 +166,23 @@ const Categories: React.FC = () => {
             </Button>
           </div>
 
-          {filteredProducts.length > 0 ? (
+          {productsLoading ? (
             <div className={
               viewMode === 'grid'
                 ? 'grid grid-cols-1 sm:grid-cols-2 gap-4'
                 : 'space-y-4'
             }>
-              {filteredProducts.map((product) => (
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="h-72 rounded-xl" />
+              ))}
+            </div>
+          ) : products.length > 0 ? (
+            <div className={
+              viewMode === 'grid'
+                ? 'grid grid-cols-1 sm:grid-cols-2 gap-4'
+                : 'space-y-4'
+            }>
+              {products.map((product) => (
                 <ProductCard 
                   key={product.id} 
                   product={product} 

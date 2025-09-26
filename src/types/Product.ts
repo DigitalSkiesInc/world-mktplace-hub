@@ -29,6 +29,43 @@ export interface ProductCategory {
   parentId?: string;
 }
 
+export interface DbProduct {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  currency: 'WLD' | 'USD';
+  images: string[];
+  category_id: string;
+  condition: 'new' | 'second-hand';
+  seller_id: string;
+  location: string;
+  created_at: string;
+  updated_at: string;
+  status: 'active' | 'sold' | 'pending' | 'inactive';
+  views: number;
+  is_featured: boolean;
+}
+
+export interface DbCategory {
+  id: string;
+  name: string;
+  slug: string;
+  icon: string;
+  parent_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DbSeller {
+  id: string;
+  username: string;
+  rating: number;
+  is_verified: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ChatMessage {
   id: string;
   senderId: string;

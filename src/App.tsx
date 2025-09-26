@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Categories from "./pages/Categories";
 import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
+import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 
@@ -40,12 +41,13 @@ const App = () => (
             <Routes>
               {/* <Route path="/login" element={<Login />} /> */}
               {/* <Route element={<ProtectedLayout />}> */}
-                <Route path="/" element={<Home />} />
-                <Route path="/categories" element={<Categories />} />
-                <Route path="/categories/:slug" element={<Categories />} />
-                <Route path="/chat" element={<Chat />} />
-                <Route path="/chat/:id" element={<Chat />} />
-                <Route path="/profile" element={<Profile />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/categories" element={<Categories />} />
+              <Route path="/categories/:slug" element={<Categories />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/chat/:id" element={<Chat />} />
+              <Route path="/profile" element={<Profile />} />
               {/* </Route> */}
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
