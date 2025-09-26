@@ -44,10 +44,10 @@ const App = () => (
               <Route path="/" element={<Home />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/categories/:slug" element={<Categories />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/chat" element={<Chat />} />
-              <Route path="/chat/:id" element={<Chat />} />
-              <Route path="/profile" element={<Profile />} />
+              {/* <Route path="/product/:id" element={<ProductDetail />} /> */}
+              {/* <Route path="/chat" element={<Chat />} /> */}
+              {/* <Route path="/chat/:id" element={<Chat />} /> */}
+              {/* <Route path="/profile" element={<Profile />} /> */}
               {/* </Route> */}
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

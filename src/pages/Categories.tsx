@@ -102,7 +102,7 @@ const Categories: React.FC = () => {
           </div>
 
           {/* Sort */}
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Sort by..." />
@@ -115,7 +115,7 @@ const Categories: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
         </div>
       </div>
 
