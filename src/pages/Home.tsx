@@ -125,7 +125,7 @@ const Home: React.FC = () => {
         </section>
 
         {/* CTA Section */}
-        {!user && (
+        {/* {!user && (
           <section className="text-center py-8 bg-gradient-card rounded-xl">
             <h3 className="text-lg font-semibold text-foreground mb-2">
               Join World Marketplace
@@ -139,7 +139,7 @@ const Home: React.FC = () => {
               </Button>
             </Link>
           </section>
-        )}
+        )} */}
       </div>
     </div>
   );

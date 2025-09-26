@@ -24,7 +24,7 @@ const Categories: React.FC = () => {
     return matchesCategory && matchesSearch && matchesCondition;
   });
 
-  const conditions = ['all', 'new', 'like-new', 'good', 'fair', 'poor'];
+  const conditions = ['all', 'new', 'second-hand'];
 
   return (
     <div className="pb-20">

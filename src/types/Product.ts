@@ -6,7 +6,7 @@ export interface Product {
   currency: 'WLD' | 'USD';
   images: string[];
   category: ProductCategory;
-  condition: 'new' | 'like-new' | 'good' | 'fair' | 'poor';
+  condition: 'new' | 'second-hand';
   seller: {
     id: string;
     username: string;

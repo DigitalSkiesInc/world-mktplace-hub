@@ -1,14 +1,17 @@
 import { Product, ProductCategory, ListingFee } from '@/types/Product';
 
 export const categories: ProductCategory[] = [
-  { id: '1', name: 'Electronics', slug: 'electronics', icon: '📱' },
-  { id: '2', name: 'Fashion', slug: 'fashion', icon: '👕' },
-  { id: '3', name: 'Home & Garden', slug: 'home-garden', icon: '🏠' },
-  { id: '4', name: 'Sports', slug: 'sports', icon: '⚽' },
-  { id: '5', name: 'Vehicles', slug: 'vehicles', icon: '🚗' },
-  { id: '6', name: 'Books & Media', slug: 'books-media', icon: '📚' },
-  { id: '7', name: 'Toys & Games', slug: 'toys-games', icon: '🎮' },
-  { id: '8', name: 'Art & Collectibles', slug: 'art-collectibles', icon: '🎨' },
+  { id: '1', name: 'Phones & Tablets', slug: 'phone-tablets', icon: '📱' },
+  { id: '2', name: 'Electronics', slug: 'electronics', icon: '🖥️' },
+  { id: '3', name: 'Fashion', slug: 'fashion', icon: '👕' },
+  { id: '4', name: 'Home & Furniture', slug: 'home-furniture', icon: '🏠' },
+  { id: '5', name: 'Animals & Pets', slug: 'animal-pets', icon: '🐱' },
+  { id: '6', name: 'Health & Beauty', slug: 'health-beauty', icon: '💄' },
+  { id: '7', name: 'Sports', slug: 'sports', icon: '⚽' },
+  { id: '8', name: 'Vehicles', slug: 'vehicles', icon: '🚗' },
+  { id: '9', name: 'Books & Media', slug: 'books-media', icon: '📚' },
+  { id: '10', name: 'Toys & Games', slug: 'toys-games', icon: '🎮' },
+  { id: '11', name: 'Art & Collectibles', slug: 'art-collectibles', icon: '🎨' }
 ];
 
 export const mockProducts: Product[] = [
@@ -41,8 +44,8 @@ export const mockProducts: Product[] = [
     price: 200,
     currency: 'WLD',
     images: ['/product-camera.jpg'],
-    category: categories[0],
-    condition: 'good',
+    category: categories[1],
+    condition: 'second-hand',
     seller: {
       id: 'seller2',
       username: 'VintageCollector',
@@ -63,8 +66,8 @@ export const mockProducts: Product[] = [
     price: 180,
     currency: 'WLD',
     images: ['/product-sneakers.jpg'],
-    category: categories[1],
-    condition: 'like-new',
+    category: categories[2],
+    condition: 'second-hand',
     seller: {
       id: 'seller3',
       username: 'SneakerHead',
