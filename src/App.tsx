@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { WorldAppProvider } from "@/contexts/WorldAppContext";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Outlet, Navigate } from "react-router-dom";
@@ -20,13 +20,26 @@ const queryClient = new QueryClient();
 
 function ProtectedLayout() {
   const { user, isLoading } = useWorldApp();
-  if (isLoading) return <p>Loading…</p>;
-  return user ? 
-  <div>
+  const location = useLocation();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return (
+    <>
       <Outlet />
       <BottomNavigation />
-    </div>
-  : <Navigate to="/login" replace />;
+    </>
+  );
 }
 
 
@@ -37,10 +50,9 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <div className="min-h-screen bg-background">
-            <Routes>
-              {/* <Route path="/login" element={<Login />} /> */}
-              {/* <Route element={<ProtectedLayout />}> */}
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route element={<ProtectedLayout />}>
               <Route path="/" element={<Home />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/categories/:slug" element={<Categories />} />
@@ -48,14 +60,11 @@ const App = () => (
               <Route path="/chat" element={<Chat />} />
               <Route path="/chat/:id" element={<Chat />} />
               <Route path="/profile" element={<Profile />} />
-              {/* </Route> */}
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <BottomNavigation />
-          </div>
+            </Route>
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
-  
       </TooltipProvider>
     </WorldAppProvider>
   </QueryClientProvider>

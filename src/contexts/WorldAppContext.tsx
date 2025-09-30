@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 // World App user interface
 export interface WorldAppUser {
@@ -16,6 +17,7 @@ interface WorldAppContextType {
   isConnected: boolean;
   login: () => Promise<void>;
   logout: () => void;
+  verifyWorldId: (proof: any, nullifierHash: string, verificationLevel: 'orb' | 'device') => Promise<void>;
   // Worldcoin payment stubs
   requestPayment: (amount: number, description: string) => Promise<{ success: boolean; txHash?: string }>;
   verifyPayment: (txHash: string) => Promise<boolean>;
@@ -27,53 +29,85 @@ interface WorldAppProviderProps {
   children: ReactNode;
 }
 
+const STORAGE_KEY = 'world_app_user';
+
 export const WorldAppProvider: React.FC<WorldAppProviderProps> = ({ children }) => {
   const [user, setUser] = useState<WorldAppUser | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
 
-  // Mock World App connection check
+  // Check for existing session on mount
   useEffect(() => {
-    // TODO: Replace with actual World App SDK initialization
-    const checkWorldAppConnection = () => {
-      // Simulate World App availability check
-      setIsConnected(typeof window !== 'undefined');
+    const checkSession = async () => {
+      try {
+        const storedUser = localStorage.getItem(STORAGE_KEY);
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+          console.log('Session restored:', parsedUser.id);
+        }
+      } catch (error) {
+        console.error('Error restoring session:', error);
+        localStorage.removeItem(STORAGE_KEY);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    checkWorldAppConnection();
+    checkSession();
+    setIsConnected(typeof window !== 'undefined');
   }, []);
 
-  const login = async (): Promise<void> => {
+  const verifyWorldId = async (
+    proof: any,
+    nullifierHash: string,
+    verificationLevel: 'orb' | 'device'
+  ): Promise<void> => {
     setIsLoading(true);
     try {
-      // TODO: Replace with actual World App SDK login
-      // const result = await worldApp.login();
-      
-      // Mock successful login for development
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockUser: WorldAppUser = {
-        id: 'mock_user_123',
-        nullifierHash: 'mock_nullifier_hash_xyz',
-        verificationLevel: 'orb',
-        isVerified: true,
-        username: 'WorldUser'
-      };
-      
-      setUser(mockUser);
-      console.log('World App login successful (mock)');
+      console.log('Verifying World ID proof...');
+
+      const { data, error } = await supabase.functions.invoke('verify-world-id', {
+        body: {
+          proof,
+          nullifier_hash: nullifierHash,
+          verification_level: verificationLevel,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.success && data.user) {
+        const worldAppUser: WorldAppUser = {
+          id: data.user.id,
+          nullifierHash: data.user.nullifier_hash,
+          verificationLevel: data.user.verification_level,
+          isVerified: data.user.is_verified,
+        };
+
+        setUser(worldAppUser);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(worldAppUser));
+        console.log('World ID verification successful:', worldAppUser);
+      } else {
+        throw new Error('Verification failed');
+      }
     } catch (error) {
-      console.error('World App login failed:', error);
+      console.error('World ID verification failed:', error);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
+  const login = async (): Promise<void> => {
+    // This is a placeholder - actual login happens via IDKitWidget
+    throw new Error('Use IDKitWidget for login');
+  };
+
   const logout = (): void => {
-    // TODO: Replace with actual World App SDK logout
     setUser(null);
-    console.log('World App logout successful (mock)');
+    localStorage.removeItem(STORAGE_KEY);
+    console.log('World App logout successful');
   };
 
   // Mock Worldcoin payment functions
@@ -120,6 +154,7 @@ export const WorldAppProvider: React.FC<WorldAppProviderProps> = ({ children }) 
     isConnected,
     login,
     logout,
+    verifyWorldId,
     requestPayment,
     verifyPayment
   };
