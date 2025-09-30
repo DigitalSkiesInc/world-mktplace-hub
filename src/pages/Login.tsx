@@ -21,6 +21,7 @@ export default function Login() {
 
   const handleSignIn = async () => {
     if (!MiniKit.isInstalled()) {
+      // console.log(`minikit installed ${MiniKit.isInstalled()}`)
       toast({
         title: "World App Not Found",
         description: "Please open this app in World App to sign in with World ID.",
