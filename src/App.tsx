@@ -47,7 +47,10 @@ function ProtectedLayout() {
 const App = () => {
   useEffect(() => {
     // ✅ Install MiniKit when app starts
-    MiniKit.install(import.meta.env.VITE_APP_ID);
+    console.log(import.meta.env.VITE_APP_ID);
+    MiniKit.install(
+   import.meta.env.VITE_APP_ID!, // the `!` tells TS it's defined
+  );
   }, []);
 
 
