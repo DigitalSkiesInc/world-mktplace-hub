@@ -14,8 +14,6 @@ import Profile from "./pages/Profile";
 import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
-import { MiniKit } from "@worldcoin/minikit-js";
-import React, {  useEffect } from 'react';
 
 
 const queryClient = new QueryClient();
@@ -44,17 +42,8 @@ function ProtectedLayout() {
   );
 }
 
-const App = () => {
-  useEffect(() => {
-    // ✅ Install MiniKit when app starts
-    console.log(import.meta.env.VITE_APP_ID);
-    MiniKit.install(
-   import.meta.env.VITE_APP_ID!, // the `!` tells TS it's defined
-  );
-  }, []);
 
-
-return (
+const App = () => (
   <QueryClientProvider client={queryClient}>
     <WorldAppProvider>
       <TooltipProvider>
@@ -80,6 +69,5 @@ return (
     </WorldAppProvider>
   </QueryClientProvider>
 );
-}
 
 export default App;
