@@ -128,7 +128,6 @@ export type Database = {
           is_verified: boolean
           rating: number
           updated_at: string
-          user_profile_id: string | null
           username: string
         }
         Insert: {
@@ -137,7 +136,6 @@ export type Database = {
           is_verified?: boolean
           rating?: number
           updated_at?: string
-          user_profile_id?: string | null
           username: string
         }
         Update: {
@@ -146,43 +144,7 @@ export type Database = {
           is_verified?: boolean
           rating?: number
           updated_at?: string
-          user_profile_id?: string | null
           username?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sellers_user_profile_id_fkey"
-            columns: ["user_profile_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_profiles: {
-        Row: {
-          created_at: string
-          id: string
-          is_verified: boolean
-          nullifier_hash: string
-          updated_at: string
-          verification_level: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_verified?: boolean
-          nullifier_hash: string
-          updated_at?: string
-          verification_level: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_verified?: boolean
-          nullifier_hash?: string
-          updated_at?: string
-          verification_level?: string
         }
         Relationships: []
       }

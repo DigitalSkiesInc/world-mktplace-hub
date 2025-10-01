@@ -1,4 +1,1 @@
 project_id = "iaigqtogtnajyopvwjij"
-
-[functions.verify-world-id]
-verify_jwt = false
