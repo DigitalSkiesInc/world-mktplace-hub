@@ -5,65 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useWorldApp } from '@/contexts/WorldAppContext';
-import { mockProducts } from '@/data/mockData';
-
-// Mock chat conversations
-const mockConversations = [
-  {
-    id: '1',
-    participant: {
-      id: 'user1',
-      username: 'TechDealer',
-      isVerified: true,
-    },
-    product: mockProducts[0],
-    lastMessage: {
-      text: 'Is the phone still available?',
-      timestamp: new Date(Date.now() - 300000).toISOString(),
-      isFromMe: false,
-      isRead: true,
-    },
-    unreadCount: 0,
-  },
-  {
-    id: '2',
-    participant: {
-      id: 'user2',
-      username: 'VintageCollector',
-      isVerified: true,
-    },
-    product: mockProducts[1],
-    lastMessage: {
-      text: 'Thanks for your interest! The camera is in excellent condition.',
-      timestamp: new Date(Date.now() - 3600000).toISOString(),
-      isFromMe: true,
-      isRead: false,
-    },
-    unreadCount: 2,
-  },
-  {
-    id: '3',
-    participant: {
-      id: 'user3',
-      username: 'SneakerHead',
-      isVerified: false,
-    },
-    product: mockProducts[2],
-    lastMessage: {
-      text: 'Would you consider $150?',
-      timestamp: new Date(Date.now() - 7200000).toISOString(),
-      isFromMe: false,
-      isRead: true,
-    },
-    unreadCount: 1,
-  },
-];
+import { useConversations } from '@/hooks/useConversations';
 
 const Chat: React.FC = () => {
   const { user } = useWorldApp();
   const [searchQuery, setSearchQuery] = React.useState('');
+  const { data: conversations = [], isLoading } = useConversations();
 
-  const filteredConversations = mockConversations.filter(conv =>
+  const filteredConversations = conversations.filter(conv =>
     conv.participant.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
     conv.product.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -121,7 +70,12 @@ const Chat: React.FC = () => {
 
       {/* Conversations */}
       <div className="px-4 py-2">
-        {filteredConversations.length > 0 ? (
+        {isLoading ? (
+          <div className="text-center py-12">
+            <MessageCircle size={48} className="mx-auto text-muted-foreground mb-4 animate-pulse" />
+            <p className="text-muted-foreground">Loading conversations...</p>
+          </div>
+        ) : filteredConversations.length > 0 ? (
           <div className="space-y-2">
             {filteredConversations.map((conversation) => (
               <Link
@@ -154,17 +108,19 @@ const Chat: React.FC = () => {
                   </div>
 
                   {/* Last Message */}
-                  <p className="text-sm text-muted-foreground truncate">
-                    {conversation.lastMessage.isFromMe && 'You: '}
-                    {conversation.lastMessage.text}
-                  </p>
+                  {conversation.lastMessage && (
+                    <p className="text-sm text-muted-foreground truncate">
+                      {conversation.lastMessage.senderId === user?.id && 'You: '}
+                      {conversation.lastMessage.content}
+                    </p>
+                  )}
                 </div>
 
                 {/* Timestamp & Unread */}
                 <div className="flex flex-col items-end gap-1 flex-shrink-0">
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Clock size={12} />
-                    {formatTime(conversation.lastMessage.timestamp)}
+                    {formatTime(conversation.lastMessageAt)}
                   </div>
                   
                   {conversation.unreadCount > 0 && (
@@ -200,15 +156,6 @@ const Chat: React.FC = () => {
         )}
       </div>
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-20 right-4">
-        <Button
-          size="lg"
-          className="rounded-full w-14 h-14 bg-gradient-primary shadow-elevated hover:shadow-glow"
-        >
-          <MessageCircle size={24} />
-        </Button>
-      </div>
     </div>
   );
 };

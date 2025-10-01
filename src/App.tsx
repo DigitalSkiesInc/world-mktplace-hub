@@ -10,6 +10,7 @@ import { useWorldApp } from '@/contexts/WorldAppContext';
 import Home from "./pages/Home";
 import Categories from "./pages/Categories";
 import Chat from "./pages/Chat";
+import ChatConversation from "./pages/ChatConversation";
 import Profile from "./pages/Profile";
 import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
@@ -46,7 +47,7 @@ const App = () => (
               <Route path="/categories/:slug" element={<Categories />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/chat" element={<Chat />} />
-              <Route path="/chat/:id" element={<Chat />} />
+              <Route path="/chat/:id" element={<ChatConversation />} />
               <Route path="/profile" element={<Profile />} />
               {/* </Route> */}
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
