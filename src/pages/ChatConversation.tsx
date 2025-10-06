@@ -63,6 +63,7 @@ const ChatConversation: React.FC = () => {
     );
   }
 
+
   if (!conversation) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
@@ -135,7 +136,9 @@ const ChatConversation: React.FC = () => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-        {conversation.messages.map((msg) => {
+        {conversation.messages.length === 0 ? (
+          <p className="text-muted-foreground text-center">No messages yet. Start the conversation!</p>
+        ) : (conversation.messages.map((msg) => {
           const isOwnMessage = msg.senderId === user.id;
           return (
             <div
@@ -163,7 +166,8 @@ const ChatConversation: React.FC = () => {
               </div>
             </div>
           );
-        })}
+        })
+  )}
         <div ref={messagesEndRef} />
       </div>
 

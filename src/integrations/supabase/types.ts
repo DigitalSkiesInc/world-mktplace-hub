@@ -50,6 +50,13 @@ export type Database = {
             referencedRelation: "categories"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_sellers"
+            referencedColumns: ["category_id"]
+          },
         ]
       }
       conversations: {
@@ -85,6 +92,20 @@ export type Database = {
             foreignKeyName: "conversations_buyer_id_fkey"
             columns: ["buyer_id"]
             isOneToOne: false
+            referencedRelation: "products_with_sellers"
+            referencedColumns: ["seller_id"]
+          },
+          {
+            foreignKeyName: "conversations_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
@@ -93,6 +114,27 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_sellers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_sellers"
+            referencedColumns: ["seller_id"]
+          },
+          {
+            foreignKeyName: "conversations_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -144,6 +186,20 @@ export type Database = {
             foreignKeyName: "messages_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
+            referencedRelation: "products_with_sellers"
+            referencedColumns: ["seller_id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
@@ -161,7 +217,7 @@ export type Database = {
           is_featured: boolean
           location: string
           price: number
-          seller_id: string
+          seller_id: string | null
           status: string
           title: string
           updated_at: string
@@ -178,7 +234,7 @@ export type Database = {
           is_featured?: boolean
           location: string
           price: number
-          seller_id: string
+          seller_id?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -195,7 +251,7 @@ export type Database = {
           is_featured?: boolean
           location?: string
           price?: number
-          seller_id?: string
+          seller_id?: string | null
           status?: string
           title?: string
           updated_at?: string
@@ -210,10 +266,31 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "products_seller_id_fkey"
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_sellers"
+            referencedColumns: ["category_id"]
+          },
+          {
+            foreignKeyName: "products_user_profiles_id_fkey"
             columns: ["seller_id"]
             isOneToOne: false
-            referencedRelation: "sellers"
+            referencedRelation: "products_with_sellers"
+            referencedColumns: ["seller_id"]
+          },
+          {
+            foreignKeyName: "products_user_profiles_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_user_profiles_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -251,6 +328,20 @@ export type Database = {
             foreignKeyName: "sellers_user_profile_id_fkey"
             columns: ["user_profile_id"]
             isOneToOne: false
+            referencedRelation: "products_with_sellers"
+            referencedColumns: ["seller_id"]
+          },
+          {
+            foreignKeyName: "sellers_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sellers_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
@@ -260,9 +351,11 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_seller: boolean | null
           is_verified: boolean
           nullifier_hash: string
           profile_picture_url: string | null
+          rating: number | null
           updated_at: string
           username: string | null
           verification_level: string
@@ -271,9 +364,11 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_seller?: boolean | null
           is_verified?: boolean
           nullifier_hash: string
           profile_picture_url?: string | null
+          rating?: number | null
           updated_at?: string
           username?: string | null
           verification_level: string
@@ -282,9 +377,11 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_seller?: boolean | null
           is_verified?: boolean
           nullifier_hash?: string
           profile_picture_url?: string | null
+          rating?: number | null
           updated_at?: string
           username?: string | null
           verification_level?: string
@@ -294,10 +391,95 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      products_with_sellers: {
+        Row: {
+          category_icon: string | null
+          category_id: string | null
+          category_name: string | null
+          category_parent_id: string | null
+          category_slug: string | null
+          condition: string | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          id: string | null
+          images: string[] | null
+          is_featured: boolean | null
+          location: string | null
+          price: number | null
+          seller_id: string | null
+          seller_is_verified: boolean | null
+          seller_rating: number | null
+          seller_username: string | null
+          status: string | null
+          title: string | null
+          updated_at: string | null
+          views: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["category_parent_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["category_parent_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_sellers"
+            referencedColumns: ["category_id"]
+          },
+        ]
+      }
+      public_profiles: {
+        Row: {
+          id: string | null
+          is_seller: boolean | null
+          is_verified: boolean | null
+          profile_picture_url: string | null
+          rating: number | null
+          username: string | null
+        }
+        Insert: {
+          id?: string | null
+          is_seller?: boolean | null
+          is_verified?: boolean | null
+          profile_picture_url?: string | null
+          rating?: number | null
+          username?: string | null
+        }
+        Update: {
+          id?: string | null
+          is_seller?: boolean | null
+          is_verified?: boolean | null
+          profile_picture_url?: string | null
+          rating?: number | null
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_conversations_with_participant: {
+        Args: { conversation_id?: string; current_user_id: string }
+        Returns: {
+          created_at: string
+          id: string
+          last_message_at: string
+          participant_id: string
+          participant_is_verified: boolean
+          participant_profile_picture_url: string
+          participant_username: string
+          product_currency: string
+          product_id: string
+          product_images: string[]
+          product_price: number
+          product_title: string
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

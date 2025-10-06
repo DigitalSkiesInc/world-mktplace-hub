@@ -37,21 +37,13 @@ export const useConversation = (conversationId: string) => {
       if (!user?.id) return null;
 
       // Get conversation details
-      const { data: conversation, error: convError } = await supabase
-        .from('conversations')
-        .select(`
-          id,
-          product_id,
-          buyer_id,
-          seller_id,
-          products (id, title, images, price, currency),
-          buyer:user_profiles!conversations_buyer_id_fkey (id, username, profile_picture_url, is_verified),
-          seller:user_profiles!conversations_seller_id_fkey (id, username, profile_picture_url, is_verified)
-        `)
-        .eq('id', conversationId)
-        .single();
+      const { data: conversation, error: convError } = await supabase.rpc('get_conversations_with_participant', {
+        conversation_id: conversationId,
+        current_user_id: user.id
+      }).single();
 
-      if (convError) throw convError;
+      if (convError || !conversation) throw convError ?? new Error('Conversation not found');
+
 
       // Get messages
       const { data: messages, error: msgError } = await supabase
@@ -62,23 +54,21 @@ export const useConversation = (conversationId: string) => {
 
       if (msgError) throw msgError;
 
-      const isUserBuyer = conversation.buyer_id === user.id;
-      const participant = isUserBuyer ? conversation.seller : conversation.buyer;
 
       return {
         id: conversation.id,
         product: {
-          id: conversation.products.id,
-          title: conversation.products.title,
-          images: conversation.products.images,
-          price: conversation.products.price,
-          currency: conversation.products.currency,
+          id: conversation.product_id,
+          title: conversation.product_title,
+          images: conversation.product_images,
+          price: conversation.product_price,
+          currency: conversation.product_currency,
         },
         participant: {
-          id: participant.id,
-          username: participant.username,
-          profilePictureUrl: participant.profile_picture_url,
-          isVerified: participant.is_verified,
+          id: conversation.participant_id,
+          username: conversation.participant_username,
+          profilePictureUrl: conversation.participant_profile_picture_url,
+          isVerified: conversation.participant_is_verified,
         },
         messages: messages.map((msg: any) => ({
           id: msg.id,

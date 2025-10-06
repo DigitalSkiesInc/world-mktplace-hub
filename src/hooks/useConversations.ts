@@ -32,26 +32,16 @@ export const useConversations = () => {
     queryFn: async () => {
       if (!user?.id) return [];
 
-      const { data: conversations, error } = await supabase
-        .from('conversations')
-        .select(`
-          id,
-          product_id,
-          buyer_id,
-          seller_id,
-          last_message_at,
-          products (id, title, images),
-          buyer:user_profiles!conversations_buyer_id_fkey (id, username, profile_picture_url, is_verified),
-          seller:user_profiles!conversations_seller_id_fkey (id, username, profile_picture_url, is_verified)
-        `)
-        .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
-        .order('last_message_at', { ascending: false });
+      const { data: conversations, error } = await supabase.rpc(
+        'get_conversations_with_participant',
+        { current_user_id: user.id }
+      );
 
       if (error) throw error;
 
       // Get last message and unread count for each conversation
       const conversationsWithDetails = await Promise.all(
-        (conversations || []).map(async (conv: any) => {
+        (conversations || [] ).map(async (conv) => {
           // Get last message
           const { data: lastMessage } = await supabase
             .from('messages')
@@ -70,21 +60,21 @@ export const useConversations = () => {
             .neq('sender_id', user.id);
 
           // Determine who the other participant is
-          const isUserBuyer = conv.buyer_id === user.id;
-          const participant = isUserBuyer ? conv.seller : conv.buyer;
+          // const isUserBuyer = conv.buyer_id === user.id;
+          // const participant = isUserBuyer ? conv.seller : conv.buyer;
 
           return {
             id: conv.id,
             product: {
-              id: conv.products.id,
-              title: conv.products.title,
-              images: conv.products.images,
+              id: conv.product_id,
+              title: conv.product_title,
+              images: conv.product_images,
             },
             participant: {
-              id: participant.id,
-              username: participant.username,
-              profilePictureUrl: participant.profile_picture_url,
-              isVerified: participant.is_verified,
+              id: conv.participant_id,
+              username: conv.participant_username,
+              profilePictureUrl: conv.participant_profile_picture_url,
+              isVerified: conv.participant_is_verified,
             },
             lastMessage: lastMessage ? {
               content: lastMessage.content,

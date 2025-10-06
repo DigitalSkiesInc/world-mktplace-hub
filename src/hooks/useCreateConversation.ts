@@ -10,20 +10,6 @@ export const useCreateConversation = () => {
     mutationFn: async ({ productId, sellerId }: { productId: string; sellerId: string }) => {
       if (!user?.id) throw new Error('User not authenticated');
 
-      // Check if conversation already exists
-      const { data: existing } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('product_id', productId)
-        .eq('buyer_id', user.id)
-        .eq('seller_id', sellerId)
-        .maybeSingle();
-
-      if (existing) {
-        return existing;
-      }
-
-      // Create new conversation
       const { data, error } = await supabase
         .from('conversations')
         .insert({
@@ -34,8 +20,22 @@ export const useCreateConversation = () => {
         .select()
         .single();
 
+      if (error && error.code === '23505') {
+        // Unique violation → fetch the existing conversation
+        const { data: existing } = await supabase
+          .from('conversations')
+          .select('*')
+          .eq('product_id', productId)
+          .eq('buyer_id', user.id)
+          .eq('seller_id', sellerId)
+          .single();
+
+        return existing;
+      }
+
       if (error) throw error;
       return data;
+
     },
     onError: (error) => {
       toast({
