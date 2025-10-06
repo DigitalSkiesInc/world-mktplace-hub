@@ -55,7 +55,7 @@ const Home: React.FC = () => {
 
             {/* Quick Actions */}
             <div className="flex gap-3 justify-center">
-              <Link to="/list">
+              <Link to="/list-product">
                 <Button className="bg-gradient-primary hover:shadow-glow">
                   <Plus size={16} className="mr-2" />
                   Sell Item

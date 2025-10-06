@@ -146,6 +146,60 @@ export type Database = {
           },
         ]
       }
+      listing_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          listing_type: string
+          payment_status: string
+          product_id: string
+          seller_id: string
+          transaction_hash: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          listing_type?: string
+          payment_status?: string
+          product_id: string
+          seller_id: string
+          transaction_hash?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          listing_type?: string
+          payment_status?: string
+          product_id?: string
+          seller_id?: string
+          transaction_hash?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_payments_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_payments_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_sellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
