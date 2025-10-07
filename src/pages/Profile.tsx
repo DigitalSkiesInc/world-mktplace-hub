@@ -25,24 +25,9 @@ import { useConversations } from '@/hooks/useConversations';
 const Profile: React.FC = () => {
   const { user, login, logout } = useWorldApp();
   const { toast } = useToast();
-  const [sellerInfo, setSellerInfo] = useState<any>(null);
   const { data: conversations = [] } = useConversations();
 
-  useEffect(() => {
-    const fetchSellerInfo = async () => {
-      if (!user?.id) return;
-
-      const { data } = await supabase
-        .from('sellers')
-        .select('*')
-        .eq('user_profile_id', user.id)
-        .maybeSingle();
-
-      setSellerInfo(data);
-    };
-
-    fetchSellerInfo();
-  }, [user?.id]);
+ 
 
   const handleLogin = async () => {
     try {
@@ -131,7 +116,7 @@ const Profile: React.FC = () => {
           
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4">
-            {sellerInfo && (
+            {user.isSeller && (
               <div className="text-center">
                 <p className="text-2xl font-bold text-foreground">0</p>
                 <p className="text-xs text-muted-foreground">Listings</p>
@@ -141,9 +126,9 @@ const Profile: React.FC = () => {
               <p className="text-2xl font-bold text-foreground">{conversations.length}</p>
               <p className="text-xs text-muted-foreground">Chats</p>
             </div>
-            {sellerInfo && (
+            {user.isSeller && (
               <div className="text-center">
-                <p className="text-2xl font-bold text-foreground">{sellerInfo.rating.toFixed(1)}</p>
+                <p className="text-2xl font-bold text-foreground">{user.rating.toFixed(1)}</p>
                 <p className="text-xs text-muted-foreground">Rating</p>
               </div>
             )}
@@ -151,7 +136,7 @@ const Profile: React.FC = () => {
         </Card>
 
         {/* Quick Actions - Only show if user has seller profile */}
-        {sellerInfo && (
+        {user.isSeller && (
           <Card className="p-4 mb-6">
             <h3 className="font-semibold text-foreground mb-4">Quick Actions</h3>
             <div className="space-y-3">
@@ -166,7 +151,7 @@ const Profile: React.FC = () => {
         )}
 
         {/* Total Earnings - Only show if user has seller profile */}
-        {sellerInfo && (
+        {user.isSeller && (
           <Card className="p-4 mb-6 bg-gradient-primary">
             <div className="flex items-center justify-between text-white">
               <div>
@@ -184,7 +169,7 @@ const Profile: React.FC = () => {
         <Card className="p-4 mb-6">
           <h3 className="font-semibold text-foreground mb-4">Account</h3>
           <div className="space-y-2">
-            {sellerInfo && (
+            {user.isSeller && (
               <Link to="/my-listings" className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors">
                 <div className="flex items-center gap-3">
                   <Package size={20} className="text-muted-foreground" />
@@ -211,7 +196,7 @@ const Profile: React.FC = () => {
         </Card>
 
         {/* Listing Fees Info - Only show if user has seller profile */}
-        {sellerInfo && (
+        {user.isSeller && (
           <Card className="p-4 mb-6">
             <h3 className="font-semibold text-foreground mb-4">Listing Fees</h3>
             <div className="space-y-3">

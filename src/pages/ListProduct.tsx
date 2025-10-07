@@ -59,31 +59,9 @@ export default function ListProduct() {
       setCategories(data || []);
     };
 
-    // Check if user has seller profile
-    const checkSeller = async () => {
-      if (!user?.id) return;
-      
-      const { data } = await supabase
-        .from('sellers')
-        .select('id')
-        .eq('user_profile_id', user.id)
-        .maybeSingle();
-
-      if (!data) {
-        toast({
-          title: 'Seller Profile Required',
-          description: 'Please create a seller profile first',
-          variant: 'destructive',
-        });
-        navigate('/profile');
-        return;
-      }
-
-      setSellerId(data.id);
-    };
 
     fetchCategories();
-    checkSeller();
+    setSellerId(user.id);
   }, [user, navigate]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

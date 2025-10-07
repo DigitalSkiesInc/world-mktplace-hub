@@ -8,9 +8,14 @@ interface WorldAppUser {
   profilePictureUrl?: string;
   isVerified: boolean;
 }
+interface AppUser extends WorldAppUser{
+
+  isSeller: boolean,
+  rating?:number
+}
 
 interface WorldAppContextType {
-  user: WorldAppUser | null;
+  user: AppUser | null;
   isLoading: boolean;
   isConnected: boolean;
   login: () => Promise<void>;
@@ -22,7 +27,7 @@ const WorldAppContext = createContext<WorldAppContextType | undefined>(undefined
 //const DEV_USER_ID = '00000000-0000-0000-0000-000000000001';
 
 export const WorldAppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<WorldAppUser | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
 
@@ -46,6 +51,8 @@ export const WorldAppProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             username: data.username || 'Anonymous',
             profilePictureUrl: data.profile_picture_url || undefined,
             isVerified: data.is_verified,
+            isSeller: data.is_seller,
+            rating: data.rating
           });
           setIsConnected(true);
           
@@ -79,6 +86,9 @@ export const WorldAppProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         username: data.username || 'Anonymous',
         profilePictureUrl: data.profile_picture_url || undefined,
         isVerified: data.is_verified,
+        isSeller:data.is_seller,
+        rating:data.rating
+
       });
     }
     setIsLoading(false);
