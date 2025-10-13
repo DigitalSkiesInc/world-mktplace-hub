@@ -151,11 +151,6 @@ export const WorldAppProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
        const data= await signInUser(worldcoinUser, nonce);
 
-       toast({
-        title: "sign in returned" + JSON.stringify(data),
-        description: "Successfully connected with your wallet",
-      });
-
        const { userId } =data
 
       if (!userId) throw new Error('Login failed, no user ID returned');
