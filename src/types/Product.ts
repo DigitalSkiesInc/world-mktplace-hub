@@ -11,7 +11,7 @@ export interface Product {
     id: string;
     username: string;
     rating: number;
-    isVerified: boolean;
+    isVerified: boolean
   };
   location: string;
   createdAt: string;
@@ -64,6 +64,7 @@ export interface DbSeller {
   is_verified: boolean;
   created_at: string;
   updated_at: string;
+  sellerUserId:string;
 }
 
 export interface ChatMessage {

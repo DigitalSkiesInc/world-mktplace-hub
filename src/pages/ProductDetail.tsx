@@ -1,24 +1,58 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, Share, MapPin, Star, Shield, MessageCircle, Phone } from 'lucide-react';
 import { useProduct } from '@/hooks/useProducts';
+import { useCreateConversation } from '@/hooks/useCreateConversation';
+import { useWorldApp } from '@/contexts/WorldAppContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from '@/hooks/use-toast';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useWorldApp();
   const { data: product, isLoading, error } = useProduct(id!);
   const [isFavorited, setIsFavorited] = React.useState(false);
+  const createConversation = useCreateConversation();
 
   const handleFavoriteClick = () => {
     setIsFavorited(!isFavorited);
   };
 
-  const handleContactSeller = () => {
-    // Navigate to chat or open contact modal
-    console.log('Contact seller:', product?.seller.username);
+  const handleContactSeller = async () => {
+    if (!user) {
+      toast({
+        title: 'Authentication required',
+        description: 'Please log in to contact the seller',
+      });
+      navigate('/profile');
+      return;
+    }
+
+    if (!product) return;
+
+    // Don't allow contacting yourself
+    if (product.seller.id === user.id) {
+      toast({
+        title: 'Cannot message yourself',
+        description: 'This is your own listing',
+      });
+      return;
+    }
+
+    try {
+      const conversation = await createConversation.mutateAsync({
+        productId: product.id,
+        sellerId: product.seller.id,
+      });
+
+      navigate(`/chat/${conversation.id}`);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+    }
   };
 
   const handleShare = () => {
@@ -217,6 +251,7 @@ const ProductDetail: React.FC = () => {
             variant="outline"
             className="flex-1"
             onClick={handleContactSeller}
+            disabled={createConversation.isPending}
           >
             <MessageCircle size={18} className="mr-2" />
             Message
@@ -224,9 +259,10 @@ const ProductDetail: React.FC = () => {
           <Button
             className="flex-1 bg-gradient-primary text-primary-foreground"
             onClick={handleContactSeller}
+            disabled={createConversation.isPending}
           >
             <Phone size={18} className="mr-2" />
-            Contact Seller
+            {createConversation.isPending ? 'Starting chat...' : 'Contact Seller'}
           </Button>
         </div>
       </div>

@@ -43,7 +43,8 @@ const Home: React.FC = () => {
             </p>
             
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="relative mb-6">
+            <form onSubmit={handleSearch} className="relative mb-6 flex">
+              <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
               <Input
                 placeholder="Search products..."
@@ -51,11 +52,15 @@ const Home: React.FC = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-card border-border"
               />
+              </div>
+              <Button type="submit" className="ml-3 bg-gradient-primary hover:shadow-glow">
+                Search
+              </Button>
             </form>
 
             {/* Quick Actions */}
             <div className="flex gap-3 justify-center">
-              <Link to="/list">
+              <Link to="">
                 <Button className="bg-gradient-primary hover:shadow-glow">
                   <Plus size={16} className="mr-2" />
                   Sell Item

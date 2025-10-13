@@ -146,60 +146,6 @@ export type Database = {
           },
         ]
       }
-      listing_payments: {
-        Row: {
-          amount: number
-          created_at: string
-          currency: string
-          id: string
-          listing_type: string
-          payment_status: string
-          product_id: string
-          seller_id: string
-          transaction_hash: string | null
-          updated_at: string
-        }
-        Insert: {
-          amount: number
-          created_at?: string
-          currency?: string
-          id?: string
-          listing_type?: string
-          payment_status?: string
-          product_id: string
-          seller_id: string
-          transaction_hash?: string | null
-          updated_at?: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          currency?: string
-          id?: string
-          listing_type?: string
-          payment_status?: string
-          product_id?: string
-          seller_id?: string
-          transaction_hash?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "listing_payments_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "listing_payments_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products_with_sellers"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       messages: {
         Row: {
           content: string
@@ -516,24 +462,7 @@ export type Database = {
       }
     }
     Functions: {
-      get_conversations_with_participant: {
-        Args: { conversation_id?: string; current_user_id: string }
-        Returns: {
-          created_at: string
-          id: string
-          last_message_at: string
-          participant_id: string
-          participant_is_verified: boolean
-          participant_profile_picture_url: string
-          participant_username: string
-          product_currency: string
-          product_id: string
-          product_images: string[]
-          product_price: number
-          product_title: string
-          updated_at: string
-        }[]
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

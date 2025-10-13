@@ -14,13 +14,10 @@ export const useProducts = (filters: ProductFilters = {}) => {
     queryKey: ['products', filters],
     queryFn: async () => {
       let query = supabase
-        .from('products')
-        .select(`
-          *,
-          categories:category_id(id, name, slug, icon, parent_id),
-          sellers:seller_id(id, username, rating, is_verified)
-        `)
+        .from('products_with_sellers')
+        .select('*')
         .eq('status', 'active');
+
 
       // Apply filters
       if (filters.categoryId) {
@@ -47,7 +44,7 @@ export const useProducts = (filters: ProductFilters = {}) => {
           query = query.order('price', { ascending: false });
           break;
         case 'rating_desc':
-          query = query.order('sellers(rating)', { ascending: false });
+          query = query.order('seller_rating', { ascending: false });
           break;
         case 'oldest':
           query = query.order('created_at', { ascending: true });
@@ -73,14 +70,11 @@ export const useProduct = (id: string) => {
     queryKey: ['product', id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('products')
-        .select(`
-          *,
-          categories:category_id(id, name, slug, icon, parent_id),
-          sellers:seller_id(id, username, rating, is_verified)
-        `)
+        .from('products_with_sellers')   // instead of 'products'
+        .select('*')
         .eq('id', id)
         .single();
+
 
       if (error) throw error;
 
@@ -120,18 +114,18 @@ function transformDbProductToProduct(dbProduct: any): Product {
     currency: dbProduct.currency,
     images: dbProduct.images,
     category: {
-      id: dbProduct.categories.id,
-      name: dbProduct.categories.name,
-      slug: dbProduct.categories.slug,
-      icon: dbProduct.categories.icon,
-      parentId: dbProduct.categories.parent_id,
+      id: dbProduct.category_id,
+      name: dbProduct.category_name,
+      slug: dbProduct.category_slug,
+      icon: dbProduct.category_icon,
+      parentId: dbProduct.category_parent_id,
     },
     condition: dbProduct.condition,
     seller: {
-      id: dbProduct.sellers.id,
-      username: dbProduct.sellers.username,
-      rating: dbProduct.sellers.rating,
-      isVerified: dbProduct.sellers.is_verified,
+      id: dbProduct.seller_id,
+      username: dbProduct.seller_username,
+      rating: dbProduct.sellers_rating,
+      isVerified: dbProduct.sellers_is_verified,
     },
     location: dbProduct.location,
     createdAt: dbProduct.created_at,

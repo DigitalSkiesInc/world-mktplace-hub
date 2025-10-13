@@ -1,137 +1,209 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from "@/hooks/use-toast";
 
-// World App user interface
-export interface WorldAppUser {
+interface WorldAppUser {
   id: string;
-  nullifierHash: string;
-  verificationLevel: 'orb' | 'device';
+  walletAddress: string;
+  username: string;
+  profilePictureUrl?: string;
   isVerified: boolean;
-  username?: string;
+}
+interface AppUser extends WorldAppUser{
+
+  isSeller: boolean,
+  rating?:number
 }
 
-// World App authentication context
 interface WorldAppContextType {
-  user: WorldAppUser | null;
+  user: AppUser | null;
   isLoading: boolean;
   isConnected: boolean;
-  login: () => Promise<void>;
+  login: (worldcoinUser?: {
+    walletAddress: string;
+    username: string;
+    profilePictureUrl?: string;
+  },
+    nonce?: string
+
+  ) => Promise<void>;
   logout: () => void;
-  // Worldcoin payment stubs
-  requestPayment: (amount: number, description: string) => Promise<{ success: boolean; txHash?: string }>;
-  verifyPayment: (txHash: string) => Promise<boolean>;
 }
 
 const WorldAppContext = createContext<WorldAppContextType | undefined>(undefined);
 
-interface WorldAppProviderProps {
-  children: ReactNode;
-}
 
-export const WorldAppProvider: React.FC<WorldAppProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<WorldAppUser | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+export const signInUser = async ({
+  walletAddress, username, profilePictureUrl
+}: {
+  walletAddress: string;
+  username: string;
+  profilePictureUrl?: string;
+}, nonce: string) => {
+  try {
+    const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/signin', {
+      method: 'POST',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ walletAddress, username, profilePictureUrl, nonce },
+
+      ),
+    }
+  );
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Worldcoin sign-in failed');
+
+
+
+    await supabase.auth.setSession({
+      access_token: data.access_token,
+      refresh_token: data.refresh_token || ''
+    });
+
+
+    localStorage.setItem('worldapp_user_id', data.userId);
+    return data;
+  } catch (err) {
+    console.error('Worldcoin sign-in error:', err);
+    throw err;
+  }
+};
+
+export const WorldAppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<AppUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
+  const { toast } = useToast();
 
-  // Mock World App connection check
   useEffect(() => {
-    // TODO: Replace with actual World App SDK initialization
-    const checkWorldAppConnection = () => {
-      // Simulate World App availability check
-      setIsConnected(typeof window !== 'undefined');
+    // Load user from localStorage or set default dev user
+    const loadUser = async () => {
+      const storedUserId = localStorage.getItem('worldapp_user_id');
+      const userId = storedUserId ;
+
+      try {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+
+        if (data && !error) {
+          setUser({
+            id: data.id,
+            walletAddress: data.wallet_address || '',
+            username: data.username || 'Anonymous',
+            profilePictureUrl: data.profile_picture_url || undefined,
+            isVerified: data.is_verified,
+            isSeller: data.is_seller,
+            rating: data.rating
+          });
+          setIsConnected(true);
+          
+          // Store in localStorage for persistence
+          if (!storedUserId) {
+            localStorage.setItem('worldapp_user_id', userId);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user:', error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    checkWorldAppConnection();
+    loadUser();
   }, []);
 
-  const login = async (): Promise<void> => {
+
+  const fetchUserProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (data && !error) {
+      setUser({
+        id: data.id,
+        walletAddress: data.wallet_address || '',
+        username: data.username || 'Anonymous',
+        profilePictureUrl: data.profile_picture_url || undefined,
+        isVerified: data.is_verified,
+        isSeller:data.is_seller,
+        rating:data.rating
+
+      });
+    }
+    setIsLoading(false);
+  };
+
+  const login =  async (worldcoinUser?: {
+    walletAddress: string;
+    username: string;
+    profilePictureUrl?: string;
+  },
+    nonce?: string
+  ) => {
     setIsLoading(true);
     try {
-      // TODO: Replace with actual World App SDK login
-      // const result = await worldApp.login();
+       if (!worldcoinUser) throw new Error('Worldcoin user info required');
       
-      // Mock successful login for development
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockUser: WorldAppUser = {
-        id: 'mock_user_123',
-        nullifierHash: 'mock_nullifier_hash_xyz',
-        verificationLevel: 'orb',
-        isVerified: true,
-        username: 'WorldUser'
-      };
-      
-      setUser(mockUser);
-      console.log('World App login successful (mock)');
-    } catch (error) {
-      console.error('World App login failed:', error);
-      throw error;
+       const data= await signInUser(worldcoinUser, nonce);
+
+       toast({
+        title: "sign in returned" + JSON.stringify(data),
+        description: "Successfully connected with your wallet",
+      });
+
+       const { userId } =data
+
+      if (!userId) throw new Error('Login failed, no user ID returned');
+   
+      await fetchUserProfile(userId);
+      setIsConnected(true);
+
+      toast({
+        title: "Connected!",
+        description: "Successfully connected with your wallet",
+      });
+
+
+
+    } catch (err) {
+      throw err;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = (): void => {
-    // TODO: Replace with actual World App SDK logout
+
+
+  
+
+  const logout = async() => {
+    await supabase.auth.signOut();
     setUser(null);
-    console.log('World App logout successful (mock)');
-  };
-
-  // Mock Worldcoin payment functions
-  const requestPayment = async (amount: number, description: string): Promise<{ success: boolean; txHash?: string }> => {
-    setIsLoading(true);
-    try {
-      // TODO: Replace with actual Worldcoin payment SDK
-      console.log(`Requesting payment: ${amount} WLD for ${description}`);
-      
-      // Mock payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const mockTxHash = `0x${Math.random().toString(16).substring(2)}`;
-      
-      return {
-        success: true,
-        txHash: mockTxHash
-      };
-    } catch (error) {
-      console.error('Worldcoin payment failed:', error);
-      return { success: false };
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const verifyPayment = async (txHash: string): Promise<boolean> => {
-    try {
-      // TODO: Replace with actual Worldcoin verification
-      console.log(`Verifying payment: ${txHash}`);
-      
-      // Mock verification
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return true;
-    } catch (error) {
-      console.error('Payment verification failed:', error);
-      return false;
-    }
-  };
-
-  const value: WorldAppContextType = {
-    user,
-    isLoading,
-    isConnected,
-    login,
-    logout,
-    requestPayment,
-    verifyPayment
+    setIsConnected(false);
+    localStorage.removeItem('worldapp_user_id');
   };
 
   return (
-    <WorldAppContext.Provider value={value}>
+    <WorldAppContext.Provider
+      value={{
+        user,
+        isLoading,
+        isConnected,
+        login,
+        logout,
+      }}
+    >
       {children}
     </WorldAppContext.Provider>
   );
 };
 
-export const useWorldApp = (): WorldAppContextType => {
+export const useWorldApp = () => {
   const context = useContext(WorldAppContext);
   if (context === undefined) {
     throw new Error('useWorldApp must be used within a WorldAppProvider');
