@@ -42,9 +42,11 @@ function ProtectedLayout() {
 }
 
  
+
 // import('eruda').then((module) => {
 //         module.default.init();
 //       });
+
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
