@@ -58,22 +58,7 @@ export default function Login() {
       const { nonce } = await res.json()
 
 
-      if (!nonce) {
-
-
-        toast({
-          title: `failed to fetch nonce nonce`,
-          description: "Fetching nonce ",
-          variant: "destructive",
-        });
-
-        throw new Error("An error occurred. Please try again.");
-
-
-
-      }
-
-
+      if (!nonce) throw new Error("An error occurred. Please try again.");
 
 
       const { finalPayload } = await MiniKit.commandsAsync.walletAuth({
