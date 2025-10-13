@@ -7,6 +7,7 @@ import { WorldAppProvider } from "@/contexts/WorldAppContext";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Outlet, Navigate } from "react-router-dom";
 import { useWorldApp } from '@/contexts/WorldAppContext';
+import { Loader2 } from 'lucide-react';
 import Home from "./pages/Home";
 import Categories from "./pages/Categories";
 import Chat from "./pages/Chat";
@@ -25,7 +26,13 @@ const queryClient = new QueryClient();
 
 function ProtectedLayout() {
   const { user, isLoading } = useWorldApp();
-  if (isLoading) return <p>Loading…</p>;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
   return user ? 
   <div>
       <Outlet />
