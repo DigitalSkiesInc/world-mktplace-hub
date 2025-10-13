@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from "@/hooks/use-toast";
 
 interface WorldAppUser {
   id: string;
@@ -18,18 +19,61 @@ interface WorldAppContextType {
   user: AppUser | null;
   isLoading: boolean;
   isConnected: boolean;
-  login: () => Promise<void>;
+  login: (worldcoinUser?: {
+    walletAddress: string;
+    username: string;
+    profilePictureUrl?: string;
+  },
+    nonce?: string
+
+  ) => Promise<void>;
   logout: () => void;
 }
 
 const WorldAppContext = createContext<WorldAppContextType | undefined>(undefined);
 
-//const DEV_USER_ID = '00000000-0000-0000-0000-000000000001';
+
+export const signInUser = async ({
+  walletAddress, username, profilePictureUrl
+}: {
+  walletAddress: string;
+  username: string;
+  profilePictureUrl?: string;
+}, nonce: string) => {
+  try {
+    const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/signin', {
+      method: 'POST',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ walletAddress, username, profilePictureUrl, nonce },
+
+      ),
+    }
+  );
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Worldcoin sign-in failed');
+
+
+
+    await supabase.auth.setSession({
+      access_token: data.access_token,
+      refresh_token: data.refresh_token || ''
+    });
+
+
+    localStorage.setItem('worldapp_user_id', data.userId);
+    return data;
+  } catch (err) {
+    console.error('Worldcoin sign-in error:', err);
+    throw err;
+  }
+};
 
 export const WorldAppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AppUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Load user from localStorage or set default dev user
@@ -94,62 +138,46 @@ export const WorldAppProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setIsLoading(false);
   };
 
-  const login = async () => {
+  const login =  async (worldcoinUser?: {
+    walletAddress: string;
+    username: string;
+    profilePictureUrl?: string;
+  },
+    nonce?: string
+  ) => {
     setIsLoading(true);
     try {
-      // ✅ Temporary dev login
-      const { data: { user }, error } = await supabase.auth.signInWithPassword({
-        email: 'dev@local.test',
-        password: 'password123',  // match whatever you used at sign-up
+       if (!worldcoinUser) throw new Error('Worldcoin user info required');
+      
+       const data= await signInUser(worldcoinUser, nonce);
+
+       toast({
+        title: "sign in returned" + JSON.stringify(data),
+        description: "Successfully connected with your wallet",
       });
 
-      if (error){
-        console.error(`error logging in ${error.message}`)
-        throw error
-      }
+       const { userId } =data
 
-      if (user) {
-        await fetchUserProfile(user.id);
-        setIsConnected(true);
-        localStorage.setItem('worldapp_user_id', user.id);
-      }
+      if (!userId) throw new Error('Login failed, no user ID returned');
+   
+      await fetchUserProfile(userId);
+      setIsConnected(true);
+
+      toast({
+        title: "Connected!",
+        description: "Successfully connected with your wallet",
+      });
+
+
+
     } catch (err) {
-      console.error('Login error:', err);
+      throw err;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // const login = async () => {
-  //   setIsLoading(true);
-  //   // In development, just load the default user
-  //   // In production, this would connect to Worldcoin wallet
-  //   setTimeout(async () => {
-  //     try {
-  //       const { data, error } = await supabase
-  //         .from('user_profiles')
-  //         .select('*')
-  //         .eq('id', DEV_USER_ID)
-  //         .single();
 
-  //       if (data && !error) {
-  //         setUser({
-  //           id: data.id,
-  //           walletAddress: data.wallet_address || '',
-  //           username: data.username || 'Anonymous',
-  //           profilePictureUrl: data.profile_picture_url || undefined,
-  //           isVerified: data.is_verified,
-  //         });
-  //         setIsConnected(true);
-  //         localStorage.setItem('worldapp_user_id', DEV_USER_ID);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error logging in:', error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   }, 500);
-  // };
 
   
 
