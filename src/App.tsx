@@ -18,6 +18,7 @@ import Login from "./pages/Login";
 import ListProduct from "./pages/ListProduct";
 import ListingPayment from "./pages/ListingPayment";
 import MyListings from "./pages/MyListings";
+import MiniKitProvider from "./providers//minikit-provider";
 
 
 const queryClient = new QueryClient();
@@ -33,9 +34,14 @@ function ProtectedLayout() {
   : <Navigate to="/login" replace />;
 }
 
+ 
+import('eruda').then((module) => {
+        module.default.init();
+      });
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <MiniKitProvider>
     <WorldAppProvider>
       <TooltipProvider>
         <Toaster />
@@ -43,8 +49,8 @@ const App = () => (
         <BrowserRouter>
           <div className="min-h-screen bg-background">
             <Routes>
-              {/* <Route path="/login" element={<Login />} /> */}
-              {/* <Route element={<ProtectedLayout />}> */}
+              <Route path="/login" element={<Login />} />
+              <Route element={<ProtectedLayout />}>
               <Route path="/" element={<Home />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/categories/:slug" element={<Categories />} />
@@ -55,16 +61,19 @@ const App = () => (
               <Route path="/list-product" element={<ListProduct />} />
               <Route path="/list-product/:id/payment" element={<ListingPayment />} />
               <Route path="/my-listings" element={<MyListings />} />
-              {/* </Route> */}
+              </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
+          
             </Routes>
-            <BottomNavigation />
+
+            
           </div>
         </BrowserRouter>
   
       </TooltipProvider>
     </WorldAppProvider>
+    </MiniKitProvider>
   </QueryClientProvider>
 );
 

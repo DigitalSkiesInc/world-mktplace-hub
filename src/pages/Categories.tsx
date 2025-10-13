@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams,useLocation } from 'react-router-dom';
 import { ArrowLeft, Filter, Grid, List, Search } from 'lucide-react';
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
@@ -8,13 +8,18 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useProducts, useCategories, ProductFilters } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useNavigate } from 'react-router-dom';
 
 const Categories: React.FC = () => {
   const { slug } = useParams();
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const searchParam = queryParams.get('search') || '';
+  const [searchQuery, setSearchQuery] = React.useState(searchParam);
   const [viewMode, setViewMode] = React.useState<'grid' | 'list'>('grid');
   const [selectedCondition, setSelectedCondition] = React.useState<string>('all');
   const [sortBy, setSortBy] = React.useState<string>('newest');
+  const navigate = useNavigate();
 
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   
@@ -38,6 +43,12 @@ const Categories: React.FC = () => {
     { value: 'price_desc', label: 'Price: High to Low' },
     { value: 'rating_desc', label: 'Best Rated' },
   ];
+
+  const handleSearchChange = (e) => {
+  const value = e.target.value;
+  setSearchQuery(value);
+  navigate(`/categories?search=${encodeURIComponent(value)}`);
+};
 
   return (
     <div className="pb-20">
@@ -83,7 +94,7 @@ const Categories: React.FC = () => {
             <Input
               placeholder="Search products..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={ handleSearchChange}
               className="pl-10"
             />
           </div>
