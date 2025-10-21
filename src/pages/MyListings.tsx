@@ -18,21 +18,10 @@ export default function MyListings() {
     const fetchListings = async () => {
       if (!user?.id) return;
 
-      const { data: sellerData } = await supabase
-        .from('sellers')
-        .select('id')
-        .eq('user_profile_id', user.id)
-        .maybeSingle();
-
-      if (!sellerData) {
-        setLoading(false);
-        return;
-      }
-
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('seller_id', sellerData.id)
+        .eq('seller_id', user.id)
         .order('created_at', { ascending: false });
 
       if (!error && data) {

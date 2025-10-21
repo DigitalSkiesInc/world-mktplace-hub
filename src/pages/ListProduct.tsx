@@ -128,8 +128,8 @@ export default function ListProduct() {
         seller_id: sellerId,
       });
 
-      // Navigate to payment page
-      navigate(`/list-product/${product.id}/payment`);
+      // Navigate to preview page
+      navigate(`/list-product/${product.id}/preview`);
     } catch (error) {
       console.error('Failed to create product:', error);
     }

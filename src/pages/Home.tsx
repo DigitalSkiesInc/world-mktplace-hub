@@ -8,10 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useWorldApp } from '@/contexts/WorldAppContext';
 import heroImage from '@/assets/marketplace-hero.jpg';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useWorldApp();
   const [searchQuery, setSearchQuery] = React.useState('');
   
   const { data: categories, isLoading: categoriesLoading } = useCategories();
@@ -60,7 +62,7 @@ const Home: React.FC = () => {
 
             {/* Quick Actions */}
             <div className="flex gap-3 justify-center">
-              <Link to="">
+              <Link to={user?.isSeller ? "/list-product" : "/seller-onboarding"}>
                 <Button className="bg-gradient-primary hover:shadow-glow">
                   <Plus size={16} className="mr-2" />
                   Sell Item

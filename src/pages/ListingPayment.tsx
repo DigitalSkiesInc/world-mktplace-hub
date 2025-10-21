@@ -42,22 +42,11 @@ export default function ListingPayment() {
       setProduct(data);
     };
 
-    const fetchSeller = async () => {
-      if (!user?.id) return;
-
-      const { data } = await supabase
-        .from('sellers')
-        .select('id')
-        .eq('user_profile_id', user.id)
-        .maybeSingle();
-
-      if (data) {
-        setSellerId(data.id);
-      }
-    };
-
     fetchProduct();
-    fetchSeller();
+    
+    if (user?.id) {
+      setSellerId(user.id);
+    }
   }, [id, user, navigate]);
 
   const handlePayment = async () => {

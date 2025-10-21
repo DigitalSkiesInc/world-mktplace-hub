@@ -349,96 +349,59 @@ export type Database = {
           },
         ]
       }
-      sellers: {
-        Row: {
-          created_at: string
-          id: string
-          is_verified: boolean
-          rating: number
-          updated_at: string
-          user_profile_id: string | null
-          username: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_verified?: boolean
-          rating?: number
-          updated_at?: string
-          user_profile_id?: string | null
-          username: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_verified?: boolean
-          rating?: number
-          updated_at?: string
-          user_profile_id?: string | null
-          username?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sellers_user_profile_id_fkey"
-            columns: ["user_profile_id"]
-            isOneToOne: false
-            referencedRelation: "products_with_sellers"
-            referencedColumns: ["seller_id"]
-          },
-          {
-            foreignKeyName: "sellers_user_profile_id_fkey"
-            columns: ["user_profile_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sellers_user_profile_id_fkey"
-            columns: ["user_profile_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_profiles: {
         Row: {
+          city: string | null
+          country: string | null
           created_at: string
+          display_location: string | null
+          email: string | null
           id: string
           is_seller: boolean | null
           is_verified: boolean
-          nullifier_hash: string
+          name: string | null
+          phone: string | null
           profile_picture_url: string | null
           rating: number | null
+          state: string | null
           updated_at: string
           username: string | null
-          verification_level: string
           wallet_address: string | null
         }
         Insert: {
+          city?: string | null
+          country?: string | null
           created_at?: string
+          display_location?: string | null
+          email?: string | null
           id?: string
           is_seller?: boolean | null
           is_verified?: boolean
-          nullifier_hash: string
+          name?: string | null
+          phone?: string | null
           profile_picture_url?: string | null
           rating?: number | null
+          state?: string | null
           updated_at?: string
           username?: string | null
-          verification_level: string
           wallet_address?: string | null
         }
         Update: {
+          city?: string | null
+          country?: string | null
           created_at?: string
+          display_location?: string | null
+          email?: string | null
           id?: string
           is_seller?: boolean | null
           is_verified?: boolean
-          nullifier_hash?: string
+          name?: string | null
+          phone?: string | null
           profile_picture_url?: string | null
           rating?: number | null
+          state?: string | null
           updated_at?: string
           username?: string | null
-          verification_level?: string
           wallet_address?: string | null
         }
         Relationships: []
