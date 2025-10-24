@@ -10,6 +10,40 @@ interface CreatePaymentData {
 }
 
 export const useListingPayment = () => {
+
+
+  const initiatePayment = async (paymentDetails: {
+    productId: string;
+    sellerId: string;
+    paymentType: string;
+  }) => {
+    const res = await fetch('http://localhost:3001/api/initiate-payment', {
+      method: 'POST',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(paymentDetails),
+        }
+      );
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Payment initiation failed');
+    return data;
+    }
+
+
+   const verifyPayment = async (reference: string) => {
+    const res = await fetch('http://localhost:3001/api/verify-payment', {
+      method: 'POST',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reference }),
+        }
+      );
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Payment verification failed');
+    return data;
+    }    
+
+
   const queryClient = useQueryClient();
 
   const createPayment = useMutation({
@@ -78,5 +112,5 @@ export const useListingPayment = () => {
     },
   });
 
-  return { createPayment, mockPayment };
+  return { initiatePayment,verifyPayment,createPayment, mockPayment };
 };

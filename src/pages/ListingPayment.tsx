@@ -10,6 +10,7 @@ import { useListingPayment } from '@/hooks/useListingPayment';
 import { useListingFee } from '@/hooks/useListingFee';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { ref } from 'process';
 
 export default function ListingPayment() {
   const { id } = useParams();
@@ -18,7 +19,7 @@ export default function ListingPayment() {
   const [product, setProduct] = useState<any>(null);
   const [sellerId, setSellerId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
-  const { createPayment, mockPayment } = useListingPayment();
+  const { initiatePayment,verifyPayment,createPayment, mockPayment } = useListingPayment();
   const { data: listingFee, isLoading: isFeeLoading } = useListingFee();
 
   useEffect(() => {
@@ -57,23 +58,66 @@ export default function ListingPayment() {
     setProcessing(true);
 
     try {
-      // Create payment record
-      const payment = await createPayment.mutateAsync({
-        product_id: product.id,
-        seller_id: user.id,
-        amount: listingFee.amount,
-        currency: listingFee.currency,
+
+      // returns id and amount
+      const paymentData =await initiatePayment({
+        productId: product.id,
+        sellerId: sellerId,
+        paymentType: listingFee.payment_type
       });
 
-      // Mock payment processing
-      await mockPayment.mutateAsync(payment.id);
+      console.log("Payment Data:", paymentData);
 
-      // Navigate to product detail
+
+      // Implement payment with wildcoin for now have a delay to simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const {paymentStatus,reference} = {paymentStatus:"success",reference:paymentData.paymentId}; // replace with actual payment result
+
+      if (paymentStatus !== "success") {
+        throw new Error('Payment failed. Please try again.');
+      }
+
+      // Verify payment
+      const verifyData= await verifyPayment(reference);
+
+      console.log("Verify Data:", verifyData);
+
+      if (verifyData.status !== "success") {
+        throw new Error('Payment verification failed. Please contact support.');
+      }
+
+      toast({
+        title: 'Payment Successful',
+        description: 'Your listing fee has been paid successfully.',
+      });
+
       navigate(`/product/${product.id}`, {
         state: { paymentSuccess: true }
       });
+
+      // // Create payment record
+      // const payment = await createPayment.mutateAsync({
+      //   product_id: product.id,
+      //   seller_id: user.id,
+      //   amount: listingFee.amount,
+      //   currency: listingFee.currency,
+      // });
+
+      // // Mock payment processing
+      // await mockPayment.mutateAsync(payment.id);
+
+      // // Navigate to product detail
+      // navigate(`/product/${product.id}`, {
+      //   state: { paymentSuccess: true }
+      // });
     } catch (error) {
       console.error('Payment failed:', error);
+      toast({
+        title: 'Payment Failed',
+        description: (error as Error).message || 'An error occurred during payment. Please try again.',
+        variant: 'destructive',
+      });
     } finally {
       setProcessing(false);
     }
