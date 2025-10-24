@@ -259,6 +259,36 @@ export type Database = {
           },
         ]
       }
+      payment_fees: {
+        Row: {
+          amount: number
+          created_at: string | null
+          currency: string
+          id: string
+          is_active: boolean
+          payment_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          currency?: string
+          id?: string
+          is_active?: boolean
+          payment_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          currency?: string
+          id?: string
+          is_active?: boolean
+          payment_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category_id: string

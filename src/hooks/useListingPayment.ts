@@ -6,14 +6,8 @@ interface CreatePaymentData {
   product_id: string;
   seller_id: string;
   amount: number;
-  listing_type: 'basic' | 'featured' | 'premium';
+  currency: string;
 }
-
-const LISTING_FEES = {
-  basic: 0.5,
-  featured: 2.0,
-  premium: 5.0,
-};
 
 export const useListingPayment = () => {
   const queryClient = useQueryClient();
@@ -84,5 +78,5 @@ export const useListingPayment = () => {
     },
   });
 
-  return { createPayment, mockPayment, LISTING_FEES };
+  return { createPayment, mockPayment };
 };

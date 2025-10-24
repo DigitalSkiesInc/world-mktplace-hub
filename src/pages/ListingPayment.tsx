@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useWorldApp } from '@/contexts/WorldAppContext';
 import { useListingPayment } from '@/hooks/useListingPayment';
+import { useListingFee } from '@/hooks/useListingFee';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -17,7 +18,8 @@ export default function ListingPayment() {
   const [product, setProduct] = useState<any>(null);
   const [sellerId, setSellerId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
-  const { createPayment, mockPayment, LISTING_FEES } = useListingPayment();
+  const { createPayment, mockPayment } = useListingPayment();
+  const { data: listingFee, isLoading: isFeeLoading } = useListingFee();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -50,7 +52,7 @@ export default function ListingPayment() {
   }, [id, user, navigate]);
 
   const handlePayment = async () => {
-    if (!product || !sellerId || !user?.id) return;
+    if (!product || !sellerId || !user?.id || !listingFee) return;
 
     setProcessing(true);
 
@@ -59,8 +61,8 @@ export default function ListingPayment() {
       const payment = await createPayment.mutateAsync({
         product_id: product.id,
         seller_id: user.id,
-        amount: LISTING_FEES.basic,
-        listing_type: 'basic',
+        amount: listingFee.amount,
+        currency: listingFee.currency,
       });
 
       // Mock payment processing
@@ -77,10 +79,20 @@ export default function ListingPayment() {
     }
   };
 
-  if (!product) {
+  if (!product || isFeeLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!listingFee) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-destructive">Unable to load listing fee. Please try again later.</p>
+        </div>
       </div>
     );
   }
@@ -128,12 +140,8 @@ export default function ListingPayment() {
 
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Listing Type</span>
-                    <Badge>Basic</Badge>
-                  </div>
-                  <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Listing Fee</span>
-                    <span className="font-semibold">{LISTING_FEES.basic} WLD</span>
+                    <span className="font-semibold">{listingFee.amount} {listingFee.currency}</span>
                   </div>
                 </div>
 
@@ -141,7 +149,7 @@ export default function ListingPayment() {
 
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>{LISTING_FEES.basic} WLD</span>
+                  <span>{listingFee.amount} {listingFee.currency}</span>
                 </div>
               </div>
 
@@ -159,7 +167,7 @@ export default function ListingPayment() {
                 className="w-full"
                 size="lg"
                 onClick={handlePayment}
-                disabled={processing}
+                disabled={processing || !listingFee}
               >
                 {processing ? (
                   <>
