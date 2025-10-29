@@ -10,7 +10,6 @@ interface CreateProductData {
   images: string[];
   category_id: string;
   condition: 'new' | 'second-hand';
-  location: string;
   seller_id: string;
 }
 

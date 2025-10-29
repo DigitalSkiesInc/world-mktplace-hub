@@ -140,7 +140,7 @@ const Profile: React.FC = () => {
           <Card className="p-4 mb-6">
             <h3 className="font-semibold text-foreground mb-4">Quick Actions</h3>
             <div className="space-y-3">
-              <Link to="/list-item" className="block">
+              <Link to="/list-product" className="block">
                 <Button variant="outline" className="w-full justify-start">
                   <PlusCircle className="mr-2" size={18} />
                   List Item
@@ -194,31 +194,6 @@ const Profile: React.FC = () => {
             </Link>
           </div>
         </Card>
-
-        {/* Listing Fees Info - Only show if user has seller profile */}
-        {user.isSeller && (
-          <Card className="p-4 mb-6">
-            <h3 className="font-semibold text-foreground mb-4">Listing Fees</h3>
-            <div className="space-y-3">
-              {listingFees.map((fee) => (
-                <div
-                  key={fee.type}
-                  className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                >
-                  <div className="flex-1">
-                    <p className="font-medium text-foreground capitalize">{fee.type}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {fee.features.join(' • ')}
-                    </p>
-                  </div>
-                  <Badge variant="outline">
-                    {fee.price} {fee.currency}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
 
         {/* Disconnect */}
         <Button

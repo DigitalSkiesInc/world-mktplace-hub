@@ -129,11 +129,6 @@ export default function ProductPreview() {
                   <h3 className="text-sm text-muted-foreground mb-1">Category</h3>
                   <p className="text-base">{category?.name || 'N/A'}</p>
                 </div>
-
-                <div>
-                  <h3 className="text-sm text-muted-foreground mb-1">Location</h3>
-                  <p className="text-base">{product.location}</p>
-                </div>
               </div>
             </div>
 
