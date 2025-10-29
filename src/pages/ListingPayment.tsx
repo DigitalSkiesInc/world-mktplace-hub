@@ -11,6 +11,7 @@ import { useListingFee } from '@/hooks/useListingFee';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { ref } from 'process';
+import { MiniKit, tokenToDecimals, Tokens, PayCommandInput } from '@worldcoin/minikit-js'
 
 export default function ListingPayment() {
   const { id } = useParams();
@@ -19,7 +20,7 @@ export default function ListingPayment() {
   const [product, setProduct] = useState<any>(null);
   const [sellerId, setSellerId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
-  const { initiatePayment,verifyPayment,createPayment, mockPayment } = useListingPayment();
+  const { initiatePayment, verifyPayment } = useListingPayment();
   const { data: listingFee, isLoading: isFeeLoading } = useListingFee();
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export default function ListingPayment() {
     };
 
     fetchProduct();
-    
+
     if (user?.id) {
       setSellerId(user.id);
     }
@@ -60,7 +61,7 @@ export default function ListingPayment() {
     try {
 
       // returns id and amount
-      const paymentData =await initiatePayment({
+      const paymentData = await initiatePayment({
         productId: product.id,
         sellerId: sellerId,
         paymentType: listingFee.payment_type
@@ -70,16 +71,43 @@ export default function ListingPayment() {
 
 
       // Implement payment with wildcoin for now have a delay to simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
 
-      const {paymentStatus,reference} = {paymentStatus:"success",reference:paymentData.paymentId}; // replace with actual payment result
+      // const payload: PayCommandInput = {
+      //   reference: paymentData.paymentId,
+      //   to: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', // Test address
+      //   tokens: [
+      //     {
+      //       symbol: Tokens.WLD,
+      //       token_amount: tokenToDecimals(paymentData.amount, Tokens.WLD).toString(),
+      //     },
+      //     // {
+      //     //   symbol: Tokens.USDC,
+      //     //   token_amount: tokenToDecimals(3, Tokens.USDC).toString(),
+      //     // },
+      //   ],
+      //   description: 'Listing Fee Payment',
+      // }
 
-      if (paymentStatus !== "success") {
-        throw new Error('Payment failed. Please try again.');
+
+      // if (!MiniKit.isInstalled()) {
+      //   return
+      // }
+
+      // const { finalPayload } = await MiniKit.commandsAsync.pay(payload)
+      // await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const finalPayload = { status: "success", reference: paymentData.paymentId, error_code: null }; // replace with actual payment result
+
+      console.log("Final Payload:", finalPayload);
+
+     
+
+      if (finalPayload.status !== "success") {
+        throw new Error(`Payment failed. ${finalPayload.error_code || 'Please try again.'}`);
       }
 
       // Verify payment
-      const verifyData= await verifyPayment(reference);
+      const verifyData = await verifyPayment(finalPayload.reference!);
 
       console.log("Verify Data:", verifyData);
 
@@ -89,28 +117,13 @@ export default function ListingPayment() {
 
       toast({
         title: 'Payment Successful',
-        description: 'Your listing fee has been paid successfully.',
+        description: 'Payment successful! Your product listing is now active.',
       });
 
       navigate(`/product/${product.id}`, {
         state: { paymentSuccess: true }
       });
 
-      // // Create payment record
-      // const payment = await createPayment.mutateAsync({
-      //   product_id: product.id,
-      //   seller_id: user.id,
-      //   amount: listingFee.amount,
-      //   currency: listingFee.currency,
-      // });
-
-      // // Mock payment processing
-      // await mockPayment.mutateAsync(payment.id);
-
-      // // Navigate to product detail
-      // navigate(`/product/${product.id}`, {
-      //   state: { paymentSuccess: true }
-      // });
     } catch (error) {
       console.error('Payment failed:', error);
       toast({
@@ -163,8 +176,8 @@ export default function ListingPayment() {
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
                   {product.images?.[0] && (
-                    <img 
-                      src={product.images[0]} 
+                    <img
+                      src={product.images[0]}
                       alt={product.title}
                       className="w-20 h-20 object-cover rounded-md"
                     />
@@ -200,14 +213,13 @@ export default function ListingPayment() {
               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                 <h4 className="font-semibold text-sm">What you get:</h4>
                 <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>• 30-day active listing</li>
-                  <li>• Up to 5 product images</li>
+                  <li>• Your product is listed for as long as you want</li>
                   <li>• Chat with potential buyers</li>
                   <li>• Edit listing anytime</li>
                 </ul>
               </div>
 
-              <Button 
+              <Button
                 className="w-full"
                 size="lg"
                 onClick={handlePayment}

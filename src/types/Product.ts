@@ -39,7 +39,6 @@ export interface DbProduct {
   category_id: string;
   condition: 'new' | 'second-hand';
   seller_id: string;
-  location: string;
   created_at: string;
   updated_at: string;
   status: 'active' | 'sold' | 'pending' | 'inactive';

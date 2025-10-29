@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       categories: {
@@ -150,51 +175,45 @@ export type Database = {
         Row: {
           amount: number
           created_at: string
-          currency: string
+          currency: string | null
           id: string
-          listing_type: string
           payment_status: string
           product_id: string
           seller_id: string
-          transaction_hash: string | null
           updated_at: string
         }
         Insert: {
           amount: number
           created_at?: string
-          currency?: string
+          currency?: string | null
           id?: string
-          listing_type?: string
           payment_status?: string
           product_id: string
           seller_id: string
-          transaction_hash?: string | null
           updated_at?: string
         }
         Update: {
           amount?: number
           created_at?: string
-          currency?: string
+          currency?: string | null
           id?: string
-          listing_type?: string
           payment_status?: string
           product_id?: string
           seller_id?: string
-          transaction_hash?: string | null
           updated_at?: string
         }
         Relationships: [
           {
             foreignKeyName: "listing_payments_product_id_fkey"
             columns: ["product_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "listing_payments_product_id_fkey"
             columns: ["product_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "products_with_sellers"
             referencedColumns: ["id"]
           },
@@ -299,7 +318,6 @@ export type Database = {
           id: string
           images: string[]
           is_featured: boolean
-          location: string
           price: number
           seller_id: string | null
           status: string
@@ -316,7 +334,6 @@ export type Database = {
           id?: string
           images?: string[]
           is_featured?: boolean
-          location: string
           price: number
           seller_id?: string | null
           status?: string
@@ -333,7 +350,6 @@ export type Database = {
           id?: string
           images?: string[]
           is_featured?: boolean
-          location?: string
           price?: number
           seller_id?: string | null
           status?: string
@@ -482,6 +498,7 @@ export type Database = {
       }
       public_profiles: {
         Row: {
+          display_location: string | null
           id: string | null
           is_seller: boolean | null
           is_verified: boolean | null
@@ -490,6 +507,7 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          display_location?: string | null
           id?: string | null
           is_seller?: boolean | null
           is_verified?: boolean | null
@@ -498,6 +516,7 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          display_location?: string | null
           id?: string | null
           is_seller?: boolean | null
           is_verified?: boolean | null
@@ -655,6 +674,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },
