@@ -19,6 +19,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { getStatesForCountry, computeDisplayLocation } from '@/lib/locationUtils';
 import CountryPhoneInput from '@/components/ui/country-phone-input';
+import { ProfilePictureUpload } from '@/components/ProfilePictureUpload';
+import { useUploadProfilePicture } from '@/hooks/useUploadProfilePicture';
 
 import countryTelData from 'country-telephone-data'; // provides allCountries array
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
@@ -80,6 +82,8 @@ export default function SellerOnboarding() {
   const navigate = useNavigate();
   const { user } = useWorldApp();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
+  const { uploadPicture, uploading } = useUploadProfilePicture();
 
   const countries = useMemo(() => buildCountryList(), []);
 
@@ -133,6 +137,7 @@ export default function SellerOnboarding() {
           phone: parsed.number,
           display_location: displayLocation,
           is_seller: true,
+          profile_picture_url: profilePictureUrl,
         })
         .eq('id', user.id);
 
@@ -172,6 +177,19 @@ export default function SellerOnboarding() {
           </CardHeader>
 
           <CardContent>
+            <div className="mb-6">
+              <ProfilePictureUpload
+                currentImageUrl={profilePictureUrl || undefined}
+                onUpload={async (file) => {
+                  if (!user?.id) return;
+                  const url = await uploadPicture(file, user.id);
+                  if (url) setProfilePictureUrl(url);
+                }}
+                uploading={uploading}
+                userName={user?.username || 'User'}
+              />
+            </div>
+
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 {/* Name */}

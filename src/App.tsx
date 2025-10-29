@@ -21,6 +21,8 @@ import ListingPayment from "./pages/ListingPayment";
 import MyListings from "./pages/MyListings";
 import SellerOnboarding from "./pages/SellerOnboarding";
 import ProductPreview from "./pages/ProductPreview";
+import EditProfile from "./pages/EditProfile";
+import EditProduct from "./pages/EditProduct";
 import MiniKitProvider from "./providers//minikit-provider";
 
 
@@ -73,11 +75,13 @@ const App = () => (
               <Route path="/chat" element={<Chat />} />
               <Route path="/chat/:id" element={<ChatConversation />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/profile/edit" element={<EditProfile />} />
               <Route path="/seller-onboarding" element={<SellerOnboarding />} />
               <Route path="/list-product" element={<ListProduct />} />
               <Route path="/list-product/:id/preview" element={<ProductPreview />} />
               <Route path="/list-product/:id/payment" element={<ListingPayment />} />
               <Route path="/my-listings" element={<MyListings />} />
+              <Route path="/edit-product/:id" element={<EditProduct />} />
               </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

@@ -146,6 +146,12 @@ const Profile: React.FC = () => {
                   List Item
                 </Button>
               </Link>
+              <Link to="/profile/edit" className="block">
+                <Button variant="outline" className="w-full justify-start">
+                  <User className="mr-2" size={18} />
+                  Edit Profile
+                </Button>
+              </Link>
             </div>
           </Card>
         )}
