@@ -224,7 +224,7 @@ export default function SellerOnboarding() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name <span className="text-destructive">*</span></FormLabel>
+                      <FormLabel>Display Name <span className="text-destructive">*</span></FormLabel>
                       <FormControl>
                         <Input placeholder="John Doe" {...field} />
                       </FormControl>
@@ -321,7 +321,7 @@ export default function SellerOnboarding() {
                   control={form.control}
                   name="allow_phone_contact"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-2">
                       <FormControl>
                         <input
                           type="checkbox"
@@ -332,11 +332,11 @@ export default function SellerOnboarding() {
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel>
-                          Allow users to contact you via phone
+                          Allow buyers to contact you via phone
                         </FormLabel>
-                        <p className="text-sm text-muted-foreground">
+                        {/* <p className="text-sm text-muted-foreground">
                           Your phone number will be shared with potential buyers
-                        </p>
+                        </p> */}
                       </div>
                     </FormItem>
                   )}

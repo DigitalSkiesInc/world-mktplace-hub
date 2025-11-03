@@ -72,38 +72,46 @@ export default function ListingPayment() {
 
       // Implement payment with wildcoin for now have a delay to simulate payment processing
 
-      // const payload: PayCommandInput = {
-      //   reference: paymentData.paymentId,
-      //   to: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', // Test address
-      //   tokens: [
-      //     {
-      //       symbol: Tokens.WLD,
-      //       token_amount: tokenToDecimals(paymentData.amount, Tokens.WLD).toString(),
-      //     },
-      //     // {
-      //     //   symbol: Tokens.USDC,
-      //     //   token_amount: tokenToDecimals(3, Tokens.USDC).toString(),
-      //     // },
-      //   ],
-      //   description: 'Listing Fee Payment',
-      // }
+      const payload: PayCommandInput = {
+        reference: paymentData.paymentId,
+        to: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', // Test address
+        tokens: [
+          {
+            symbol: Tokens.WLD,
+            token_amount: tokenToDecimals(paymentData.amount, Tokens.WLD).toString(),
+          },
+          // {
+          //   symbol: Tokens.USDC,
+          //   token_amount: tokenToDecimals(3, Tokens.USDC).toString(),
+          // },
+        ],
+        description: 'Listing Fee Payment',
+      }
 
 
-      // if (!MiniKit.isInstalled()) {
-      //   return
-      // }
+      if (!MiniKit.isInstalled()) {
+        return
+      }
+
 
       // const { finalPayload } = await MiniKit.commandsAsync.pay(payload)
-      // await new Promise(resolve => setTimeout(resolve, 2000));
 
-      const finalPayload = { status: "success", reference: paymentData.paymentId, error_code: null }; // replace with actual payment result
+
+      // for testing, payload not set as constant
+      let { finalPayload } = await MiniKit.commandsAsync.pay(payload)
+
+      // await new Promise(resolve => setTimeout(resolve, 2000));
+      // const finalPayload = { status: "success", reference: paymentData.paymentId, error_code: null }; // replace with actual payment result
 
       console.log("Final Payload:", finalPayload);
 
      
 
       if (finalPayload.status !== "success") {
-        throw new Error(`Payment failed. ${finalPayload.error_code || 'Please try again.'}`);
+        // throw new Error(`Payment failed. ${finalPayload.error_code || 'Please try again.'}`);
+
+        // For testing purposes, simulate success even if failed
+        finalPayload ={ status: "success", reference: paymentData.paymentId, error_code: null }
       }
 
       // Verify payment

@@ -262,7 +262,7 @@ export default function EditProfile() {
                           Allow users to contact you via phone
                         </FormLabel>
                         <p className="text-sm text-muted-foreground">
-                          Your phone number will be shared with potential buyers
+                          Your phone number will be visible to potential buyers
                         </p>
                       </div>
                     </FormItem>

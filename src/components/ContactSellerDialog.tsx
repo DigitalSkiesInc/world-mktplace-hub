@@ -42,7 +42,7 @@ export function ContactSellerDialog({
         <DialogHeader>
           <DialogTitle>Contact {sellerName}</DialogTitle>
           <DialogDescription>
-            Choose how you'd like to contact the seller
+            How you'd like to contact the seller?
           </DialogDescription>
         </DialogHeader>
         

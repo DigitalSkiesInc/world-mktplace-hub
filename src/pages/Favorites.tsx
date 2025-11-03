@@ -21,6 +21,7 @@ export default function Favorites() {
       </div>
     );
   }
+  console.log('fetched favorites', favorites);
 
   return (
     <div className="pb-20">
@@ -36,7 +37,7 @@ export default function Favorites() {
       </div>
 
       <div className="p-4">
-        {favorites.length === 0 ? (
+        {favorites.length === undefined || favorites.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
               <Heart size={40} className="text-muted-foreground" />
@@ -55,13 +56,13 @@ export default function Favorites() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4">
-            {favorites.map((favorite) => {
-              const product = favorite.products as unknown as Product;
+            {favorites.map((product) => {
+              console.log('rendering favorite', product);
               return (
                 <ProductCard
-                  key={favorite.id}
+                  key={product.id}
                   product={product}
-                  onFavoriteRemove={() => handleRemoveFavorite(favorite.product_id)}
+                  onFavoriteChange={() => handleRemoveFavorite(product.id)}
                 />
               );
             })}

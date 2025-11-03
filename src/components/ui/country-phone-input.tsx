@@ -3,6 +3,8 @@ import ReactFlagsSelect from 'react-flags-select';
 import { Controller } from 'react-hook-form';
 import { getCountryCallingCode } from 'libphonenumber-js';
 import type { CountryCode } from 'libphonenumber-js';
+import { getDefaultCountry } from '@/lib/utils';
+import { get } from 'http';
 
 
 type Props = {
@@ -51,15 +53,22 @@ export default function CountryPhoneInput({
 
   useEffect(() => {
     // when mounted, set initial calling code into form if possible
-    const iso = selected;
+    const init = async () => {
+    const iso = await getDefaultCountry(true);
     let code = '';
+
     try {
-      const isoForLookup = isLikelyIso(selected) ? selected : navDefault;
+      const isoForLookup = isLikelyIso(selected) ? selected : iso; // use iso here instead of navDefault
       code = getCountryCallingCode(isoForLookup as CountryCode);
     } catch (e) {
       code = '';
     }
+
     onCountryChange(iso);
+  };
+
+  // Call it immediately
+  init();
   }, []); // only once on mount
 
   

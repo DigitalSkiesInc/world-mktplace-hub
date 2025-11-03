@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { ContactSellerDialog } from '@/components/ContactSellerDialog';
 import { toast } from '@/hooks/use-toast';
+import { SafetyNotice } from '@/components/SafetyNotice';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -137,7 +138,7 @@ const ProductDetail: React.FC = () => {
             </Link>
             <h1 className="text-lg font-semibold text-foreground">Product Details</h1>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -159,7 +160,7 @@ const ProductDetail: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-4 space-y-6">
+      <div className="p-4 space-y-6 pb-32">
         {/* Product Images Carousel */}
         <div className="relative">
           <Carousel className="w-full">
@@ -183,7 +184,7 @@ const ProductDetail: React.FC = () => {
               </>
             )}
           </Carousel>
-          
+
           {/* Badges */}
           <div className="absolute top-3 left-3 flex gap-2">
             {product.isFeatured && (
@@ -224,7 +225,7 @@ const ProductDetail: React.FC = () => {
                 <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${product.seller.username}`} />
                 <AvatarFallback>{product.seller.username[0].toUpperCase()}</AvatarFallback>
               </Avatar>
-              
+
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-medium text-foreground">{product.seller.username}</span>
@@ -273,26 +274,34 @@ const ProductDetail: React.FC = () => {
       </div>
 
       {/* Fixed Bottom CTA */}
-      <div className="fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border">
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={handleContactSeller}
-            disabled={createConversation.isPending}
-          >
-            <MessageCircle size={18} className="mr-2" />
-            Message
-          </Button>
-          {product.seller.phone && product.seller.allowPhoneContact && (
-            <Button
-              className="flex-1 bg-gradient-primary text-primary-foreground"
-              onClick={() => setShowPhoneDialog(true)}
-            >
-              <Phone size={18} className="mr-2" />
-              Contact Seller
-            </Button>
-          )}
+      <div className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border">
+        {/* CTA Buttons */}
+          <div className="px-4 py-2">
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={handleContactSeller}
+                disabled={createConversation.isPending}
+              >
+                <MessageCircle size={18} className="mr-2" />
+                {product.seller.phone ? 'Message' : 'Message Seller'}
+              </Button>
+              {product.seller.phone && product.seller.allowPhoneContact && (
+                <Button
+                  className="flex-1 bg-gradient-primary text-primary-foreground"
+                  onClick={() => setShowPhoneDialog(true)}
+                >
+                  <Phone size={18} className="mr-2" />
+                  Contact Seller
+                </Button>
+              )}
+            </div>
+          </div>
+
+        {/* Safety Notice below buttons */}
+        <div className="px-4 pb-3 pt-0">
+          <SafetyNotice />
         </div>
       </div>
 

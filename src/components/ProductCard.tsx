@@ -5,25 +5,28 @@ import { Product } from '@/types/Product';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useToggleFavorite } from '@/hooks/useToggleFavorite';
 
 interface ProductCardProps {
   product: Product;
   className?: string;
-  onFavoriteRemove?: () => void;
+  onFavoriteChange?: () => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, className, onFavoriteRemove }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, className, onFavoriteChange }) => {
+  const toggleFavorite = useToggleFavorite();
   const [isFavorited, setIsFavorited] = React.useState(false);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    if (onFavoriteRemove) {
-      onFavoriteRemove();
+    if (onFavoriteChange) {
+      onFavoriteChange();
     } else {
       setIsFavorited(!isFavorited);
     }
+    // toggleFavorite.mutate({ productId: product.id!, isFavorited });
   };
 
   return (
