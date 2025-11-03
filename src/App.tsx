@@ -23,6 +23,7 @@ import SellerOnboarding from "./pages/SellerOnboarding";
 import ProductPreview from "./pages/ProductPreview";
 import EditProfile from "./pages/EditProfile";
 import EditProduct from "./pages/EditProduct";
+import Favorites from "./pages/Favorites";
 import MiniKitProvider from "./providers//minikit-provider";
 
 
@@ -82,6 +83,7 @@ const App = () => (
               <Route path="/list-product/:id/payment" element={<ListingPayment />} />
               <Route path="/my-listings" element={<MyListings />} />
               <Route path="/edit-product/:id" element={<EditProduct />} />
+              <Route path="/favorites" element={<Favorites />} />
               </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

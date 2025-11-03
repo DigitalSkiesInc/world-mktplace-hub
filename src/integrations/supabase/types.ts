@@ -146,6 +146,42 @@ export type Database = {
           },
         ]
       }
+      favorites: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_sellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_payments: {
         Row: {
           amount: number
@@ -372,6 +408,7 @@ export type Database = {
       }
       user_profiles: {
         Row: {
+          allow_phone_contact: boolean | null
           city: string | null
           country: string | null
           created_at: string
@@ -390,6 +427,7 @@ export type Database = {
           wallet_address: string | null
         }
         Insert: {
+          allow_phone_contact?: boolean | null
           city?: string | null
           country?: string | null
           created_at?: string
@@ -408,6 +446,7 @@ export type Database = {
           wallet_address?: string | null
         }
         Update: {
+          allow_phone_contact?: boolean | null
           city?: string | null
           country?: string | null
           created_at?: string

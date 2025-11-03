@@ -69,16 +69,32 @@ export const useProduct = (id: string) => {
   return useQuery({
     queryKey: ['product', id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('products_with_sellers')   // instead of 'products'
+      // First get product data
+      const { data: productData, error: productError } = await supabase
+        .from('products_with_sellers')
         .select('*')
         .eq('id', id)
         .single();
 
+      if (productError) throw productError;
 
-      if (error) throw error;
+      // Then get seller profile data including phone
+      const { data: sellerProfile, error: sellerError } = await supabase
+        .from('user_profiles')
+        .select('phone, allow_phone_contact')
+        .eq('id', productData.seller_id)
+        .single();
 
-      return transformDbProductToProduct(data);
+      // Transform the product
+      const product = transformDbProductToProduct(productData);
+      
+      // Add seller phone info if available
+      if (sellerProfile && !sellerError) {
+        product.seller.phone = sellerProfile.phone;
+        product.seller.allowPhoneContact = sellerProfile.allow_phone_contact;
+      }
+
+      return product;
     },
   });
 };

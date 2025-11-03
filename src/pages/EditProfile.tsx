@@ -16,7 +16,16 @@ import { useUploadProfilePicture } from '@/hooks/useUploadProfilePicture';
 
 const editProfileSchema = z.object({
   email: z.string().email('Invalid email address'),
-  phone: z.string().min(1, 'Phone number is required'),
+  allow_phone_contact: z.boolean(),
+  phone: z.string().optional(),
+}).refine((data) => {
+  if (data.allow_phone_contact) {
+    return data.phone && data.phone.length > 0;
+  }
+  return true;
+}, {
+  message: 'Phone number is required when phone contact is enabled',
+  path: ['phone'],
 });
 
 type EditProfileFormData = z.infer<typeof editProfileSchema>;
@@ -33,9 +42,12 @@ export default function EditProfile() {
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
       email: '',
+      allow_phone_contact: false,
       phone: '',
     },
   });
+
+  const allowPhoneContact = form.watch('allow_phone_contact');
 
   useEffect(() => {
     if (user?.id) {
@@ -56,6 +68,7 @@ export default function EditProfile() {
       setProfile(data);
       form.reset({
         email: data.email || '',
+        allow_phone_contact: data.allow_phone_contact || false,
         phone: data.phone || '',
       });
     } catch (error: any) {
@@ -130,7 +143,8 @@ export default function EditProfile() {
         .from('user_profiles')
         .update({
           email: data.email,
-          phone: data.phone,
+          allow_phone_contact: data.allow_phone_contact,
+          phone: data.allow_phone_contact ? data.phone : null,
         })
         .eq('id', user.id);
 
@@ -232,17 +246,44 @@ export default function EditProfile() {
 
                 <FormField
                   control={form.control}
-                  name="phone"
+                  name="allow_phone_contact"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                       <FormControl>
-                        <Input type="tel" placeholder="+1234567890" {...field} />
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={field.onChange}
+                          className="h-4 w-4 rounded border-input"
+                        />
                       </FormControl>
-                      <FormMessage />
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          Allow users to contact you via phone
+                        </FormLabel>
+                        <p className="text-sm text-muted-foreground">
+                          Your phone number will be shared with potential buyers
+                        </p>
+                      </div>
                     </FormItem>
                   )}
                 />
+
+                {allowPhoneContact && (
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <Input type="tel" placeholder="+1234567890" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
                   {isSubmitting ? (

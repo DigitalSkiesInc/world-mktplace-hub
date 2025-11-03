@@ -4,10 +4,14 @@ import { ArrowLeft, Heart, Share, MapPin, Star, Shield, MessageCircle, Phone } f
 import { useProduct } from '@/hooks/useProducts';
 import { useCreateConversation } from '@/hooks/useCreateConversation';
 import { useWorldApp } from '@/contexts/WorldAppContext';
+import { useIsFavorited } from '@/hooks/useIsFavorited';
+import { useToggleFavorite } from '@/hooks/useToggleFavorite';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { ContactSellerDialog } from '@/components/ContactSellerDialog';
 import { toast } from '@/hooks/use-toast';
 
 const ProductDetail: React.FC = () => {
@@ -15,11 +19,21 @@ const ProductDetail: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useWorldApp();
   const { data: product, isLoading, error } = useProduct(id!);
-  const [isFavorited, setIsFavorited] = React.useState(false);
+  const { data: isFavorited = false } = useIsFavorited(id!);
+  const toggleFavorite = useToggleFavorite();
   const createConversation = useCreateConversation();
+  const [showPhoneDialog, setShowPhoneDialog] = React.useState(false);
 
   const handleFavoriteClick = () => {
-    setIsFavorited(!isFavorited);
+    if (!user) {
+      toast({
+        title: 'Authentication required',
+        description: 'Please log in to save favorites',
+      });
+      navigate('/profile');
+      return;
+    }
+    toggleFavorite.mutate({ productId: id!, isFavorited });
   };
 
   const handleContactSeller = async () => {
@@ -146,15 +160,29 @@ const ProductDetail: React.FC = () => {
       </div>
 
       <div className="p-4 space-y-6">
-        {/* Product Images */}
+        {/* Product Images Carousel */}
         <div className="relative">
-          <div className="aspect-square rounded-xl overflow-hidden bg-muted">
-            <img
-              src={product.images[0]}
-              alt={product.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <Carousel className="w-full">
+            <CarouselContent>
+              {product.images.map((image, index) => (
+                <CarouselItem key={index}>
+                  <div className="aspect-square rounded-xl overflow-hidden bg-muted">
+                    <img
+                      src={image}
+                      alt={`${product.title} - Image ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {product.images.length > 1 && (
+              <>
+                <CarouselPrevious className="left-2" />
+                <CarouselNext className="right-2" />
+              </>
+            )}
+          </Carousel>
           
           {/* Badges */}
           <div className="absolute top-3 left-3 flex gap-2">
@@ -256,16 +284,27 @@ const ProductDetail: React.FC = () => {
             <MessageCircle size={18} className="mr-2" />
             Message
           </Button>
-          <Button
-            className="flex-1 bg-gradient-primary text-primary-foreground"
-            onClick={handleContactSeller}
-            disabled={createConversation.isPending}
-          >
-            <Phone size={18} className="mr-2" />
-            {createConversation.isPending ? 'Starting chat...' : 'Contact Seller'}
-          </Button>
+          {product.seller.phone && product.seller.allowPhoneContact && (
+            <Button
+              className="flex-1 bg-gradient-primary text-primary-foreground"
+              onClick={() => setShowPhoneDialog(true)}
+            >
+              <Phone size={18} className="mr-2" />
+              Contact Seller
+            </Button>
+          )}
         </div>
       </div>
+
+      {/* Contact Seller Phone Dialog */}
+      {product.seller.phone && (
+        <ContactSellerDialog
+          open={showPhoneDialog}
+          onOpenChange={setShowPhoneDialog}
+          sellerName={product.seller.username}
+          phoneNumber={product.seller.phone}
+        />
+      )}
     </div>
   );
 };

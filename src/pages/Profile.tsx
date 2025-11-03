@@ -21,11 +21,13 @@ import { useToast } from '@/hooks/use-toast';
 import { listingFees } from '@/data/mockData';
 import { supabase } from '@/integrations/supabase/client';
 import { useConversations } from '@/hooks/useConversations';
+import { useFavorites } from '@/hooks/useFavorites';
 
 const Profile: React.FC = () => {
   const { user, login, logout } = useWorldApp();
   const { toast } = useToast();
   const { data: conversations = [] } = useConversations();
+  const { data: favorites = [] } = useFavorites();
 
  
 
@@ -188,6 +190,9 @@ const Profile: React.FC = () => {
                 <Heart size={20} className="text-muted-foreground" />
                 <span className="text-foreground">Favorites</span>
               </div>
+              {favorites.length > 0 && (
+                <Badge className="bg-primary">{favorites.length}</Badge>
+              )}
             </Link>
             <Link to="/chat" className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors">
               <div className="flex items-center gap-3">

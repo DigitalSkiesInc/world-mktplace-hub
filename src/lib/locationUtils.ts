@@ -136,3 +136,34 @@ export function computeDisplayLocation(
 
   return `${city}, ${countryCode}`;
 }
+
+/**
+ * Format phone number for display
+ * Handles international format with country code
+ */
+export function formatPhoneNumber(phoneNumber: string): string {
+  if (!phoneNumber) return '';
+  
+  // Remove all non-digit characters
+  const cleaned = phoneNumber.replace(/\D/g, '');
+  
+  // If starts with country code, format accordingly
+  if (phoneNumber.startsWith('+')) {
+    // Extract country code (1-3 digits)
+    const countryCodeMatch = cleaned.match(/^(\d{1,3})(\d+)/);
+    if (countryCodeMatch) {
+      const [, countryCode, rest] = countryCodeMatch;
+      
+      // Format US/Canada numbers
+      if (countryCode === '1' && rest.length === 10) {
+        return `+1 (${rest.slice(0, 3)}) ${rest.slice(3, 6)}-${rest.slice(6)}`;
+      }
+      
+      // Generic international format
+      return `+${countryCode} ${rest.replace(/(\d{3})(?=\d)/g, '$1 ')}`;
+    }
+  }
+  
+  // Default: just add spaces every 3 digits
+  return cleaned.replace(/(\d{3})(?=\d)/g, '$1 ');
+}

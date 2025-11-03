@@ -11,7 +11,9 @@ export interface Product {
     id: string;
     username: string;
     rating: number;
-    isVerified: boolean
+    isVerified: boolean;
+    phone?: string | null;
+    allowPhoneContact?: boolean;
   };
   location: string;
   createdAt: string;

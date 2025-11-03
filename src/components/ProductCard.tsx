@@ -9,15 +9,21 @@ import { cn } from '@/lib/utils';
 interface ProductCardProps {
   product: Product;
   className?: string;
+  onFavoriteRemove?: () => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, className, onFavoriteRemove }) => {
   const [isFavorited, setIsFavorited] = React.useState(false);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsFavorited(!isFavorited);
+    
+    if (onFavoriteRemove) {
+      onFavoriteRemove();
+    } else {
+      setIsFavorited(!isFavorited);
+    }
   };
 
   return (

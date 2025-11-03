@@ -34,25 +34,38 @@ const sellerOnboardingSchema = z.object({
   city: z.string().min(2, 'City is required').max(100),
   state: z.string().max(100).optional(),
   country: z.string().min(2, 'Country is required'),
-  phone_national: z.string().min(1, 'Phone number is required'),
-  phone_calling_code: z.string().min(1, 'Calling code required'),
+  allow_phone_contact: z.boolean(),
+  phone_national: z.string().optional(),
+  phone_calling_code: z.string().optional(),
 }).superRefine((vals, ctx) => {
-  try {
-    const full = `+${vals.phone_calling_code}${vals.phone_national.replace(/\D/g, '')}`;
-    const parsed = parsePhoneNumberFromString(full);
-    if (!parsed || !parsed.isValid()) {
+  // Only validate phone if allow_phone_contact is true
+  if (vals.allow_phone_contact) {
+    if (!vals.phone_national || !vals.phone_calling_code) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['phone_national'],
-        message: 'Invalid phone number for selected country',
+        message: 'Phone number is required when phone contact is enabled',
+      });
+      return;
+    }
+    
+    try {
+      const full = `+${vals.phone_calling_code}${vals.phone_national.replace(/\D/g, '')}`;
+      const parsed = parsePhoneNumberFromString(full);
+      if (!parsed || !parsed.isValid()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['phone_national'],
+          message: 'Invalid phone number for selected country',
+        });
+      }
+    } catch (e) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['phone_national'],
+        message: 'Invalid phone number',
       });
     }
-  } catch (e) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['phone_national'],
-      message: 'Invalid phone number',
-    });
   }
 });
 
@@ -95,6 +108,7 @@ export default function SellerOnboarding() {
       city: '',
       state: '',
       country: '',
+      allow_phone_contact: false,
       phone_national: '',
       phone_calling_code: '',
     },
@@ -103,6 +117,7 @@ export default function SellerOnboarding() {
   // derive selected country ISO from form (single source of truth)
   const selectedCountryISO = form.watch('country');
   const selectedCallingCode = form.watch('phone_calling_code');
+  const allowPhoneContact = form.watch('allow_phone_contact');
 
   // states for the selected country ISO (use form value)
   const states = selectedCountryISO ? getStatesForCountry(selectedCountryISO) : [];
@@ -119,10 +134,16 @@ export default function SellerOnboarding() {
 
     setIsSubmitting(true);
     try {
-      const nationalDigits = data.phone_national.replace(/\D/g, '');
-      const fullE164 = `+${data.phone_calling_code}${nationalDigits}`;
-      const parsed = parsePhoneNumberFromString(fullE164);
-      if (!parsed || !parsed.isValid()) throw new Error('Invalid phone number');
+      let phoneNumber = null;
+      
+      // Only process phone if allow_phone_contact is true
+      if (data.allow_phone_contact && data.phone_national && data.phone_calling_code) {
+        const nationalDigits = data.phone_national.replace(/\D/g, '');
+        const fullE164 = `+${data.phone_calling_code}${nationalDigits}`;
+        const parsed = parsePhoneNumberFromString(fullE164);
+        if (!parsed || !parsed.isValid()) throw new Error('Invalid phone number');
+        phoneNumber = parsed.number;
+      }
 
       const displayLocation = computeDisplayLocation(data.city, data.state, data.country);
 
@@ -134,7 +155,8 @@ export default function SellerOnboarding() {
           city: data.city,
           state: data.state || null,
           country: data.country,
-          phone: parsed.number,
+          phone: phoneNumber,
+          allow_phone_contact: data.allow_phone_contact,
           display_location: displayLocation,
           is_seller: true,
           profile_picture_url: profilePictureUrl,
@@ -294,60 +316,88 @@ export default function SellerOnboarding() {
                   />
                 )}
 
-                {/* Phone split input: now showing a disabled calling-code display + national input */}
-                <div>
-                  <FormLabel>Phone Number <span className="text-destructive">*</span></FormLabel>
-                  <div className="flex gap-2 items-start">
-                    {/* Read-only calling code display (disabled input style) */}
-                    <div className="w-36">
-                      <FormField
-                        control={form.control}
-                        name="phone_calling_code"
-                        render={({ field }) => {
-                          // Find country info to build display string (keep country name for now)
-                          const iso = form.getValues('country') || selectedCountryISO || '';
-                          const countryObj = countries.find((c) => c.iso2 === iso);
-                          const flag = countryObj?.flag || '';
-                          const displayCountryName = countryObj?.name || '';
-                          const dial = field.value || selectedCallingCode || '';
-                          const displayText = `${flag} +${dial}${displayCountryName ? ' • ' + displayCountryName : ''}`;
+                {/* Phone opt-in checkbox */}
+                <FormField
+                  control={form.control}
+                  name="allow_phone_contact"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={field.onChange}
+                          className="h-4 w-4 rounded border-input"
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          Allow users to contact you via phone
+                        </FormLabel>
+                        <p className="text-sm text-muted-foreground">
+                          Your phone number will be shared with potential buyers
+                        </p>
+                      </div>
+                    </FormItem>
+                  )}
+                />
 
-                          return (
+                {/* Phone split input: only shown if checkbox is checked */}
+                {allowPhoneContact && (
+                  <div>
+                    <FormLabel>Phone Number <span className="text-destructive">*</span></FormLabel>
+                    <div className="flex gap-2 items-start">
+                      {/* Read-only calling code display (disabled input style) */}
+                      <div className="w-36">
+                        <FormField
+                          control={form.control}
+                          name="phone_calling_code"
+                          render={({ field }) => {
+                            // Find country info to build display string
+                            const iso = form.getValues('country') || selectedCountryISO || '';
+                            const countryObj = countries.find((c) => c.iso2 === iso);
+                            const flag = countryObj?.flag || '';
+                            const displayCountryName = countryObj?.name || '';
+                            const dial = field.value || selectedCallingCode || '';
+                            const displayText = `${flag} +${dial}${displayCountryName ? ' • ' + displayCountryName : ''}`;
+
+                            return (
+                              <FormItem>
+                                <FormControl>
+                                  <Input value={displayText} disabled aria-disabled />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      </div>
+
+                      {/* National number input */}
+                      <div className="flex-1">
+                        <FormField
+                          control={form.control}
+                          name="phone_national"
+                          render={({ field }) => (
                             <FormItem>
                               <FormControl>
-                                <Input value={displayText} disabled aria-disabled />
+                                <Input
+                                  inputMode="tel"
+                                  placeholder="712345678"
+                                  {...field}
+                                  onChange={(e) => {
+                                    field.onChange(e.target.value);
+                                  }}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
-                          );
-                        }}
-                      />
-                    </div>
-
-                    {/* National number input */}
-                    <div className="flex-1">
-                      <FormField
-                        control={form.control}
-                        name="phone_national"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input
-                                inputMode="tel"
-                                placeholder="712345678"
-                                {...field}
-                                onChange={(e) => {
-                                  field.onChange(e.target.value);
-                                }}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                          )}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
                   {isSubmitting ? (
