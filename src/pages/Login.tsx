@@ -14,22 +14,22 @@ export default function Login() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  // useEffect(() => {
-  //    autoLoginDevUser();
-  // }, []);
+  useEffect(() => {
+     autoLoginDevUser();
+  }, []);
 
-  // const autoLoginDevUser = async () => {
-  //   setIsLoading(true);
-  //   await login(
-  //     {
-  //       walletAddress: "test_user",
-  //       username: "test_user",
-  //       profilePictureUrl: "",
-  //     },
-  //     "dev_nonce_value"
-  //   );
-  //   navigate("/");
-  // };
+  const autoLoginDevUser = async () => {
+    setIsLoading(true);
+    await login(
+      {
+        walletAddress: "test_user",
+        username: "test_user",
+        profilePictureUrl: "",
+      },
+      "dev_nonce_value"
+    );
+    navigate("/");
+  };
 
 
 
@@ -144,7 +144,7 @@ export default function Login() {
           Connect with your wallet to start buying and selling securely
         </p>
         <Button
-          onClick={handleSignIn}
+          // onClick={handleSignIn}
           disabled={isLoading}
           className="bg-gradient-primary hover:shadow-glow w-full flex items-center justify-center gap-2"
         >
