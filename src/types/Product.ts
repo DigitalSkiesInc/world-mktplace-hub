@@ -11,7 +11,9 @@ export interface Product {
     id: string;
     username: string;
     rating: number;
-    isVerified: boolean
+    isVerified: boolean;
+    phone?: string | null;
+    allowPhoneContact?: boolean;
   };
   location: string;
   createdAt: string;
@@ -39,7 +41,6 @@ export interface DbProduct {
   category_id: string;
   condition: 'new' | 'second-hand';
   seller_id: string;
-  location: string;
   created_at: string;
   updated_at: string;
   status: 'active' | 'sold' | 'pending' | 'inactive';

@@ -146,17 +146,15 @@ const ChatConversation: React.FC = () => {
               className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[75%] rounded-2xl px-4 py-2 ${
-                  isOwnMessage
+                className={`max-w-[75%] rounded-2xl px-4 py-2 ${isOwnMessage
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted text-foreground'
-                }`}
+                  }`}
               >
                 <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
                 <p
-                  className={`text-xs mt-1 ${
-                    isOwnMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                  }`}
+                  className={`text-xs mt-1 ${isOwnMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                    }`}
                 >
                   {new Date(msg.createdAt).toLocaleTimeString([], {
                     hour: '2-digit',
@@ -167,7 +165,7 @@ const ChatConversation: React.FC = () => {
             </div>
           );
         })
-  )}
+        )}
         <div ref={messagesEndRef} />
       </div>
 

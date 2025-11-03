@@ -8,10 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useWorldApp } from '@/contexts/WorldAppContext';
 import heroImage from '@/assets/marketplace-hero.jpg';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useWorldApp();
   const [searchQuery, setSearchQuery] = React.useState('');
   
   const { data: categories, isLoading: categoriesLoading } = useCategories();
@@ -60,7 +62,7 @@ const Home: React.FC = () => {
 
             {/* Quick Actions */}
             <div className="flex gap-3 justify-center">
-              <Link to="">
+              <Link to={user?.isSeller ? "/list-product" : "/seller-onboarding"}>
                 <Button className="bg-gradient-primary hover:shadow-glow">
                   <Plus size={16} className="mr-2" />
                   Sell Item
@@ -164,21 +166,6 @@ const Home: React.FC = () => {
             </div>
           )}
         </section>
-
-        {/* CTA Section */}
-        {/* <section className="text-center py-8 bg-gradient-card rounded-xl">
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            Join World Marketplace
-          </h3>
-          <p className="text-muted-foreground mb-4">
-            Verify with World ID to start buying and selling
-          </p>
-          <Link to="/profile">
-            <Button className="bg-gradient-primary">
-              Get Verified
-            </Button>
-          </Link>
-        </section> */}
       </div>
     </div>
   );

@@ -22,8 +22,7 @@ const productSchema = z.object({
   price: z.number().min(0.01, 'Price must be greater than 0'),
   currency: z.enum(['WLD', 'USD']),
   category_id: z.string().min(1, 'Please select a category'),
-  condition: z.enum(['new', 'second-hand']),
-  location: z.string().min(2, 'Location is required').max(100),
+  condition: z.enum(['new', 'second-hand'])
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -47,8 +46,7 @@ export default function ListProduct() {
       price: 0,
       currency: 'WLD',
       category_id: '',
-      condition: 'new',
-      location: '',
+      condition: 'new'
     },
   });
 
@@ -67,10 +65,10 @@ export default function ListProduct() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     
-    if (selectedFiles.length + files.length > 5) {
+    if (selectedFiles.length + files.length > 3) {
       toast({
         title: 'Too Many Images',
-        description: 'You can upload up to 5 images',
+        description: 'You can upload up to 3 images',
         variant: 'destructive',
       });
       return;
@@ -123,13 +121,12 @@ export default function ListProduct() {
         currency: data.currency,
         category_id: data.category_id,
         condition: data.condition,
-        location: data.location,
         images: imageUrls,
         seller_id: sellerId,
       });
 
-      // Navigate to payment page
-      navigate(`/list-product/${product.id}/payment`);
+      // Navigate to preview page
+      navigate(`/list-product/${product.id}/preview`);
     } catch (error) {
       console.error('Failed to create product:', error);
     }
@@ -278,22 +275,8 @@ export default function ListProduct() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Location</FormLabel>
-                      <FormControl>
-                        <Input placeholder="New York, NY" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <div className="space-y-4">
-                  <FormLabel>Images (up to 5)</FormLabel>
+                  <FormLabel>Images (up to 3)</FormLabel>
                   
                   <div className="grid grid-cols-3 gap-4">
                     {previewUrls.map((url, index) => (

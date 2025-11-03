@@ -21,11 +21,13 @@ import { useToast } from '@/hooks/use-toast';
 import { listingFees } from '@/data/mockData';
 import { supabase } from '@/integrations/supabase/client';
 import { useConversations } from '@/hooks/useConversations';
+import { useFavorites } from '@/hooks/useFavorites';
 
 const Profile: React.FC = () => {
   const { user, login, logout } = useWorldApp();
   const { toast } = useToast();
   const { data: conversations = [] } = useConversations();
+  const { data: favorites = [] } = useFavorites();
 
  
 
@@ -126,7 +128,7 @@ const Profile: React.FC = () => {
               <p className="text-2xl font-bold text-foreground">{conversations.length}</p>
               <p className="text-xs text-muted-foreground">Chats</p>
             </div>
-            {user.isSeller && (
+            {(user.isSeller && user.rating) && (
               <div className="text-center">
                 <p className="text-2xl font-bold text-foreground">{user.rating.toFixed(1)}</p>
                 <p className="text-xs text-muted-foreground">Rating</p>
@@ -140,10 +142,16 @@ const Profile: React.FC = () => {
           <Card className="p-4 mb-6">
             <h3 className="font-semibold text-foreground mb-4">Quick Actions</h3>
             <div className="space-y-3">
-              <Link to="/list-item" className="block">
+              <Link to="/list-product" className="block">
                 <Button variant="outline" className="w-full justify-start">
                   <PlusCircle className="mr-2" size={18} />
                   List Item
+                </Button>
+              </Link>
+              <Link to="/profile/edit" className="block">
+                <Button variant="outline" className="w-full justify-start">
+                  <User className="mr-2" size={18} />
+                  Edit Profile
                 </Button>
               </Link>
             </div>
@@ -182,6 +190,9 @@ const Profile: React.FC = () => {
                 <Heart size={20} className="text-muted-foreground" />
                 <span className="text-foreground">Favorites</span>
               </div>
+              {favorites.length > 0 && (
+                <Badge className="bg-primary">{favorites.length}</Badge>
+              )}
             </Link>
             <Link to="/chat" className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors">
               <div className="flex items-center gap-3">
@@ -194,31 +205,6 @@ const Profile: React.FC = () => {
             </Link>
           </div>
         </Card>
-
-        {/* Listing Fees Info - Only show if user has seller profile */}
-        {user.isSeller && (
-          <Card className="p-4 mb-6">
-            <h3 className="font-semibold text-foreground mb-4">Listing Fees</h3>
-            <div className="space-y-3">
-              {listingFees.map((fee) => (
-                <div
-                  key={fee.type}
-                  className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                >
-                  <div className="flex-1">
-                    <p className="font-medium text-foreground capitalize">{fee.type}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {fee.features.join(' • ')}
-                    </p>
-                  </div>
-                  <Badge variant="outline">
-                    {fee.price} {fee.currency}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
 
         {/* Disconnect */}
         <Button

@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       categories: {
@@ -146,55 +171,85 @@ export type Database = {
           },
         ]
       }
-      listing_payments: {
+      favorites: {
         Row: {
-          amount: number
-          created_at: string
-          currency: string
+          created_at: string | null
           id: string
-          listing_type: string
-          payment_status: string
           product_id: string
-          seller_id: string
-          transaction_hash: string | null
-          updated_at: string
+          user_id: string
         }
         Insert: {
-          amount: number
-          created_at?: string
-          currency?: string
+          created_at?: string | null
           id?: string
-          listing_type?: string
-          payment_status?: string
           product_id: string
-          seller_id: string
-          transaction_hash?: string | null
-          updated_at?: string
+          user_id: string
         }
         Update: {
-          amount?: number
-          created_at?: string
-          currency?: string
+          created_at?: string | null
           id?: string
-          listing_type?: string
-          payment_status?: string
           product_id?: string
-          seller_id?: string
-          transaction_hash?: string | null
-          updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "listing_payments_product_id_fkey"
+            foreignKeyName: "favorites_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "listing_payments_product_id_fkey"
+            foreignKeyName: "favorites_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
+            referencedRelation: "products_with_sellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string | null
+          id: string
+          payment_status: string
+          product_id: string
+          seller_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string | null
+          id?: string
+          payment_status?: string
+          product_id: string
+          seller_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string | null
+          id?: string
+          payment_status?: string
+          product_id?: string
+          seller_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_payments_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_payments_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
             referencedRelation: "products_with_sellers"
             referencedColumns: ["id"]
           },
@@ -259,6 +314,36 @@ export type Database = {
           },
         ]
       }
+      payment_fees: {
+        Row: {
+          amount: number
+          created_at: string | null
+          currency: string
+          id: string
+          is_active: boolean
+          payment_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          currency?: string
+          id?: string
+          is_active?: boolean
+          payment_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          currency?: string
+          id?: string
+          is_active?: boolean
+          payment_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category_id: string
@@ -269,7 +354,6 @@ export type Database = {
           id: string
           images: string[]
           is_featured: boolean
-          location: string
           price: number
           seller_id: string | null
           status: string
@@ -286,7 +370,6 @@ export type Database = {
           id?: string
           images?: string[]
           is_featured?: boolean
-          location: string
           price: number
           seller_id?: string | null
           status?: string
@@ -303,7 +386,6 @@ export type Database = {
           id?: string
           images?: string[]
           is_featured?: boolean
-          location?: string
           price?: number
           seller_id?: string | null
           status?: string
@@ -349,96 +431,62 @@ export type Database = {
           },
         ]
       }
-      sellers: {
-        Row: {
-          created_at: string
-          id: string
-          is_verified: boolean
-          rating: number
-          updated_at: string
-          user_profile_id: string | null
-          username: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_verified?: boolean
-          rating?: number
-          updated_at?: string
-          user_profile_id?: string | null
-          username: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_verified?: boolean
-          rating?: number
-          updated_at?: string
-          user_profile_id?: string | null
-          username?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sellers_user_profile_id_fkey"
-            columns: ["user_profile_id"]
-            isOneToOne: false
-            referencedRelation: "products_with_sellers"
-            referencedColumns: ["seller_id"]
-          },
-          {
-            foreignKeyName: "sellers_user_profile_id_fkey"
-            columns: ["user_profile_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sellers_user_profile_id_fkey"
-            columns: ["user_profile_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_profiles: {
         Row: {
+          allow_phone_contact: boolean | null
+          city: string | null
+          country: string | null
           created_at: string
+          display_location: string | null
+          email: string | null
           id: string
           is_seller: boolean | null
           is_verified: boolean
-          nullifier_hash: string
+          name: string | null
+          phone: string | null
           profile_picture_url: string | null
           rating: number | null
+          state: string | null
           updated_at: string
           username: string | null
-          verification_level: string
           wallet_address: string | null
         }
         Insert: {
+          allow_phone_contact?: boolean | null
+          city?: string | null
+          country?: string | null
           created_at?: string
+          display_location?: string | null
+          email?: string | null
           id?: string
           is_seller?: boolean | null
           is_verified?: boolean
-          nullifier_hash: string
+          name?: string | null
+          phone?: string | null
           profile_picture_url?: string | null
           rating?: number | null
+          state?: string | null
           updated_at?: string
           username?: string | null
-          verification_level: string
           wallet_address?: string | null
         }
         Update: {
+          allow_phone_contact?: boolean | null
+          city?: string | null
+          country?: string | null
           created_at?: string
+          display_location?: string | null
+          email?: string | null
           id?: string
           is_seller?: boolean | null
           is_verified?: boolean
-          nullifier_hash?: string
+          name?: string | null
+          phone?: string | null
           profile_picture_url?: string | null
           rating?: number | null
+          state?: string | null
           updated_at?: string
           username?: string | null
-          verification_level?: string
           wallet_address?: string | null
         }
         Relationships: []
@@ -453,6 +501,7 @@ export type Database = {
           category_parent_id: string | null
           category_slug: string | null
           condition: string | null
+          country: string | null
           created_at: string | null
           currency: string | null
           description: string | null
@@ -489,6 +538,8 @@ export type Database = {
       }
       public_profiles: {
         Row: {
+          country: string | null
+          display_location: string | null
           id: string | null
           is_seller: boolean | null
           is_verified: boolean | null
@@ -497,6 +548,8 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          country?: string | null
+          display_location?: string | null
           id?: string | null
           is_seller?: boolean | null
           is_verified?: boolean | null
@@ -505,6 +558,8 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          country?: string | null
+          display_location?: string | null
           id?: string | null
           is_seller?: boolean | null
           is_verified?: boolean | null
@@ -662,6 +717,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

@@ -172,10 +172,10 @@ const Categories: React.FC = () => {
               <span className="text-muted-foreground ml-2">({products.length})</span>
             </h2>
             
-            <Button variant="ghost" size="sm">
+            {/* <Button variant="ghost" size="sm">
               <Filter size={16} className="mr-2" />
               More Filters
-            </Button>
+            </Button> */}
           </div>
 
           {productsLoading ? (

@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useWorldApp } from "@/contexts/WorldAppContext";
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { MiniKit } from '@worldcoin/minikit-js';
 import { User, Shield, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getDefaultCountry } from "@/lib/utils";
 
 export default function Login() {
   const { login } = useWorldApp();
@@ -13,9 +14,27 @@ export default function Login() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
+  // useEffect(() => {
+  //    autoLoginDevUser();
+  // }, []);
+
+  // const autoLoginDevUser = async () => {
+  //   setIsLoading(true);
+  //   await login(
+  //     {
+  //       walletAddress: "test_user",
+  //       username: "test_user",
+  //       profilePictureUrl: "",
+  //     },
+  //     "dev_nonce_value"
+  //   );
+  //   navigate("/");
+  // };
+
+
+
   const handleSignIn = async () => {
     try {
-
 
 
       try {
@@ -58,22 +77,7 @@ export default function Login() {
       const { nonce } = await res.json()
 
 
-      if (!nonce) {
-
-
-        toast({
-          title: `failed to fetch nonce nonce`,
-          description: "Fetching nonce ",
-          variant: "destructive",
-        });
-
-        throw new Error("An error occurred. Please try again.");
-
-
-
-      }
-
-
+      if (!nonce) throw new Error("An error occurred. Please try again.");
 
 
       const { finalPayload } = await MiniKit.commandsAsync.walletAuth({
@@ -98,9 +102,6 @@ export default function Login() {
               nonce
           );
 
-
-
-
       }
 
 
@@ -111,6 +112,8 @@ export default function Login() {
       // },
       //   nonce
       // );
+
+      await getDefaultCountry(false);
 
 
 

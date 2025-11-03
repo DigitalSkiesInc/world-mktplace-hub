@@ -2,30 +2,30 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
-interface CreateProductData {
-  title: string;
-  description: string;
-  price: number;
-  currency: 'WLD' | 'USD';
-  images: string[];
-  category_id: string;
-  condition: 'new' | 'second-hand';
-  seller_id: string;
+interface UpdateProductData {
+  id: string;
+  title?: string;
+  description?: string;
+  price?: number;
+  currency?: 'WLD' | 'USD';
+  images?: string[];
+  category_id?: string;
+  condition?: 'new' | 'second-hand';
+  status?: 'active' | 'inactive' | 'paused' | 'sold';
 }
 
-export const useCreateProduct = () => {
+export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (productData: CreateProductData) => {
+    mutationFn: async ({ id, ...updateData }: UpdateProductData) => {
       const { data, error } = await supabase
         .from('products')
-        .insert({
-          ...productData,
-          status: 'inactive',
-          views: 0,
-          is_featured: false,
+        .update({
+          ...updateData,
+          updated_at: new Date().toISOString(),
         })
+        .eq('id', id)
         .select()
         .single();
 
@@ -35,14 +35,14 @@ export const useCreateProduct = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast({
-        title: 'Draft Created',
-        description: 'Your product draft has been saved.',
+        title: 'Success',
+        description: 'Product updated successfully',
       });
     },
     onError: (error: any) => {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to create product',
+        description: error.message || 'Failed to update product',
         variant: 'destructive',
       });
     },
