@@ -87,110 +87,118 @@ export default function MyListings() {
   };
 
   const ListingCard = ({ listing, showActions = true }: { listing: any; showActions?: boolean }) => (
-    <Card className="cursor-pointer hover:border-primary" onClick={() => navigate(`/product/${listing.id}`)}>
-      <CardContent className="p-4">
-        <div className="flex gap-4">
-          {listing.images?.[0] && (
-            <img 
-              src={listing.images[0]} 
-              alt={listing.title}
-              className="w-20 h-20 object-cover rounded-md"
-            />
-          )}
-          <div className="flex-1">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h3 className="font-semibold">{listing.title}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-1">
-                  {listing.description}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                {getStatusBadge(listing.status)}
-                {showActions && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+  <Card
+    className="cursor-pointer hover:border-primary"
+    onClick={() => navigate(`/product/${listing.id}`)}
+  >
+    <CardContent className="p-4">
+      <div className="flex gap-4">
+        {listing.images?.[0] && (
+          <img
+            src={listing.images[0]}
+            alt={listing.title}
+            className="w-20 h-20 object-cover rounded-md"
+          />
+        )}
+        <div className="flex-1">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h3 className="font-semibold">{listing.title}</h3>
+              <p className="text-sm text-muted-foreground line-clamp-1">
+                {listing.description}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              {getStatusBadge(listing.status)}
+              {showActions && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                    <Button variant="ghost" size="icon">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/edit-product/${listing.id}`);
+                      }}
+                    >
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit
+                    </DropdownMenuItem>
+
+                    {listing.status === 'active' && (
                       <DropdownMenuItem
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/edit-product/${listing.id}`);
+                          setPauseDialog({ open: true, id: listing.id });
                         }}
                       >
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit
+                        <Pause className="mr-2 h-4 w-4" />
+                        Pause
                       </DropdownMenuItem>
-                      
-                      {listing.status === 'active' && (
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPauseDialog({ open: true, id: listing.id });
-                          }}
-                        >
-                          <Pause className="mr-2 h-4 w-4" />
-                          Pause
-                        </DropdownMenuItem>
-                      )}
-                      
-                      {listing.status === 'paused' && (
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleResume(listing.id);
-                          }}
-                        >
-                          <Play className="mr-2 h-4 w-4" />
-                          Resume
-                        </DropdownMenuItem>
-                      )}
-                      
-                      {listing.status !== 'sold' && (
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteDialog({ open: true, id: listing.id });
-                          }}
-                          className="text-destructive"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center justify-between mt-2">
-              <span className="font-bold">
-                {listing.price} {listing.currency}
-              </span>
-              {listing.status === 'inactive' ? (
-                <Button 
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/list-product/${listing.id}/payment`);
-                  }}
-                >
-                  Complete Payment
-                </Button>
-              ) : (
-                <span className="text-sm text-muted-foreground">
-                  {listing.views} views
-                </span>
+                    )}
+
+                    {listing.status === 'paused' && (
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleResume(listing.id);
+                        }}
+                      >
+                        <Play className="mr-2 h-4 w-4" />
+                        Resume
+                      </DropdownMenuItem>
+                    )}
+
+                    {listing.status !== 'sold' && (
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteDialog({ open: true, id: listing.id });
+                        }}
+                        className="text-destructive"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </div>
+
+          {/* Responsive layout for price & button */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 gap-2">
+            <span className="font-bold">
+              {listing.price} {listing.currency}
+            </span>
+
+            {listing.status === 'inactive' ? (
+              <Button
+                size="sm"
+                className="w-fit sm:w-auto self-start"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/list-product/${listing.id}/payment`);
+                }}
+              >
+                Complete Payment
+              </Button>
+            ) : (
+              <span className="text-sm text-muted-foreground">
+                {listing.views} views
+              </span>
+            )}
+          </div>
         </div>
-      </CardContent>
-    </Card>
-  );
+      </div>
+    </CardContent>
+  </Card>
+);
+
 
   const activeListings = listings.filter(l => l.status === 'active');
   const inactiveListings = listings.filter(l => l.status === 'inactive');
@@ -219,12 +227,11 @@ export default function MyListings() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="all">
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="all">All ({listings.length})</TabsTrigger>
                 <TabsTrigger value="active">Active ({activeListings.length})</TabsTrigger>
                 <TabsTrigger value="paused">Paused ({pausedListings.length})</TabsTrigger>
                 <TabsTrigger value="inactive">Inactive ({inactiveListings.length})</TabsTrigger>
-                <TabsTrigger value="sold">Sold ({soldListings.length})</TabsTrigger>
               </TabsList>
 
               <TabsContent value="all" className="space-y-4 mt-6">

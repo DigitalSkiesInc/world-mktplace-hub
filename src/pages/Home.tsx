@@ -166,21 +166,6 @@ const Home: React.FC = () => {
             </div>
           )}
         </section>
-
-        {/* CTA Section */}
-        {/* <section className="text-center py-8 bg-gradient-card rounded-xl">
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            Join World Marketplace
-          </h3>
-          <p className="text-muted-foreground mb-4">
-            Verify with World ID to start buying and selling
-          </p>
-          <Link to="/profile">
-            <Button className="bg-gradient-primary">
-              Get Verified
-            </Button>
-          </Link>
-        </section> */}
       </div>
     </div>
   );

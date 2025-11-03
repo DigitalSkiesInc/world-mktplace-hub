@@ -65,7 +65,7 @@ export default function ListProduct() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     
-    if (selectedFiles.length + files.length > 5) {
+    if (selectedFiles.length + files.length > 3) {
       toast({
         title: 'Too Many Images',
         description: 'You can upload up to 3 images',
