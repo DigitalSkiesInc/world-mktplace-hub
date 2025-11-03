@@ -30,12 +30,12 @@ export const useListingPayment = () => {
     }
 
 
-   const verifyPayment = async (reference: string) => {
+   const verifyPayment = async (transactionDetails) => {
     const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/verify-payment', {
       method: 'POST',
       credentials: "include",
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reference }),
+      body: transactionDetails,
         }
       );
     const data = await res.json();

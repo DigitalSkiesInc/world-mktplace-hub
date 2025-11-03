@@ -100,6 +100,8 @@ export default function ListingPayment() {
       // for testing, payload not set as constant
       let { finalPayload } = await MiniKit.commandsAsync.pay(payload)
 
+ 
+
       // await new Promise(resolve => setTimeout(resolve, 2000));
       // const finalPayload = { status: "success", reference: paymentData.paymentId, error_code: null }; // replace with actual payment result
 
@@ -111,11 +113,12 @@ export default function ListingPayment() {
         // throw new Error(`Payment failed. ${finalPayload.error_code || 'Please try again.'}`);
 
         // For testing purposes, simulate success even if failed
-        finalPayload ={ status: "success", reference: paymentData.paymentId, error_code: null }
+        console.log("finalPayload status not success,", finalPayload);
+        finalPayload ={ status: "success", reference: paymentData.paymentId, error_code: null,transaction_id: "0xa5b02107433da9e2a450c433560be1db01963a9146c14eed076cbf2c61837d60"  };
       }
 
       // Verify payment
-      const verifyData = await verifyPayment(finalPayload.reference!);
+      const verifyData = await verifyPayment(JSON.stringify(finalPayload));
 
       console.log("Verify Data:", verifyData);
 

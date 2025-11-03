@@ -128,7 +128,7 @@ const Profile: React.FC = () => {
               <p className="text-2xl font-bold text-foreground">{conversations.length}</p>
               <p className="text-xs text-muted-foreground">Chats</p>
             </div>
-            {user.isSeller && (
+            {(user.isSeller && user.rating) && (
               <div className="text-center">
                 <p className="text-2xl font-bold text-foreground">{user.rating.toFixed(1)}</p>
                 <p className="text-xs text-muted-foreground">Rating</p>
