@@ -150,7 +150,7 @@ export default function SellerOnboarding() {
       const { error } = await supabase
         .from('user_profiles')
         .update({
-          name: data.name,
+          username: data.name,
           email: data.email,
           city: data.city,
           state: data.state || null,

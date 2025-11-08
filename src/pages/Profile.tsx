@@ -157,22 +157,7 @@ const Profile: React.FC = () => {
             </div>
           </Card>
         )}
-
-        {/* Total Earnings - Only show if user has seller profile */}
-        {user.isSeller && (
-          <Card className="p-4 mb-6 bg-gradient-primary">
-            <div className="flex items-center justify-between text-white">
-              <div>
-                <p className="text-sm opacity-90 mb-1">Total Earnings</p>
-                <p className="text-2xl font-bold">0 WLD</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <TrendingUp size={24} />
-              </div>
-            </div>
-          </Card>
-        )}
-
+       
         {/* Navigation Links */}
         <Card className="p-4 mb-6">
           <h3 className="font-semibold text-foreground mb-4">Account</h3>

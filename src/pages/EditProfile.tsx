@@ -199,12 +199,7 @@ export default function EditProfile() {
 
             <div className="space-y-4 pt-4 border-t">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Name</p>
-                <p className="text-base">{profile?.name || 'Not set'}</p>
-              </div>
-
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Username</p>
+                <p className="text-sm font-medium text-muted-foreground">Display Name</p>
                 <p className="text-base">{profile?.username || 'Not set'}</p>
               </div>
 
