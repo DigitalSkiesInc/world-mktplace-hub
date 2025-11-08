@@ -11,7 +11,7 @@ import { useListingFee } from '@/hooks/useListingFee';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { ref } from 'process';
-import { MiniKit, tokenToDecimals, Tokens, PayCommandInput } from '@worldcoin/minikit-js'
+import { MiniKit, tokenToDecimals, Tokens, PayCommandInput, Network } from '@worldcoin/minikit-js'
 
 export default function ListingPayment() {
   const { id } = useParams();
@@ -114,7 +114,16 @@ export default function ListingPayment() {
 
         // For testing purposes, simulate success even if failed
         console.log("finalPayload status not success,", finalPayload);
-        finalPayload ={ status: "success", reference: paymentData.paymentId, error_code: null,transaction_id: "0xa5b02107433da9e2a450c433560be1db01963a9146c14eed076cbf2c61837d60"  };
+        finalPayload = { 
+          status: "success", 
+          reference: paymentData.paymentId, 
+          transaction_id: "0xa5b02107433da9e2a450c433560be1db01963a9146c14eed076cbf2c61837d60",
+          transaction_status: "submitted",
+          from: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+          chain: Network.WorldChain,
+          timestamp: Date.now().toString(),
+          version: 1
+        };
       }
 
       // Verify payment

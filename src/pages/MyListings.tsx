@@ -77,6 +77,7 @@ export default function MyListings() {
       pending: 'outline',
       sold: 'destructive',
       paused: 'outline',
+      suspended: 'destructive',
     };
     
     return (

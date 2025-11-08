@@ -22,12 +22,18 @@ import { listingFees } from '@/data/mockData';
 import { supabase } from '@/integrations/supabase/client';
 import { useConversations } from '@/hooks/useConversations';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useNavigate } from 'react-router-dom';
+import { Settings } from 'lucide-react';
 
 const Profile: React.FC = () => {
   const { user, login, logout } = useWorldApp();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { data: conversations = [] } = useConversations();
   const { data: favorites = [] } = useFavorites();
+  const { data: userRole } = useUserRole();
+  const isAdmin = userRole === 'admin';
 
  
 
@@ -86,6 +92,19 @@ const Profile: React.FC = () => {
   return (
     <div className="pb-20">
       <div className="px-4 py-6">
+        {/* Admin Access */}
+        {isAdmin && (
+          <Card className="p-4 mb-6 bg-gradient-primary">
+            <Button 
+              className="w-full bg-background text-foreground hover:bg-background/90"
+              onClick={() => navigate('/admin')}
+            >
+              <Settings className="mr-2" size={18} />
+              Manage Platform
+            </Button>
+          </Card>
+        )}
+
         {/* Profile Header */}
         <Card className="p-6 mb-6">
           <div className="flex items-center gap-4 mb-4">
