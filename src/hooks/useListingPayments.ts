@@ -21,7 +21,7 @@ export const useListingPayments = (page: number, filters: PaymentFilters) => {
         .select(`
           *,
           products(title, id),
-          user_profiles!seller_id(username, id)
+          public_profiles!seller_id(username, id)
         `, { count: 'exact' })
         .range(start, end)
         .order('created_at', { ascending: false });

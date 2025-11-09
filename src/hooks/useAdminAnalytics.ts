@@ -7,12 +7,12 @@ export const useAdminAnalytics = () => {
     queryFn: async () => {
       // Total users
       const { count: totalUsers } = await supabase
-        .from('user_profiles')
+        .from('public_profiles')
         .select('*', { count: 'exact', head: true });
 
       // Total sellers
       const { count: totalSellers } = await supabase
-        .from('user_profiles')
+        .from('public_profiles')
         .select('*', { count: 'exact', head: true })
         .eq('is_seller', true);
 

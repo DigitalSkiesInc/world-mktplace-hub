@@ -15,7 +15,7 @@ export function StatsCard({ icon: Icon, label, value, subtitle }: StatsCardProps
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-muted-foreground">{label}</p>
-            <p className="text-3xl font-bold mt-2">{value}</p>
+            <p className="text-1xl font-bold mt-2">{value}</p>
             {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
           </div>
           <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">

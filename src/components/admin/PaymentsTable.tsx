@@ -39,7 +39,7 @@ export function PaymentsTable() {
     {
       key: 'user_profiles',
       label: 'Seller',
-      render: (item: any) => item.user_profiles?.username || 'N/A',
+      render: (item: any) => item.public_profiles?.username || 'N/A',
     },
     {
       key: 'amount',
