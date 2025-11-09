@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, LayoutDashboard, Settings, DollarSign, Package, FolderTree } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -12,14 +12,7 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children, title, subtitle }: AdminLayoutProps) {
   const navigate = useNavigate();
-
-  const navItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
-    { icon: Settings, label: 'Configuration', path: '/admin/config' },
-    { icon: DollarSign, label: 'Payments', path: '/admin/payments' },
-    { icon: Package, label: 'Listings', path: '/admin/listings' },
-    { icon: FolderTree, label: 'Categories', path: '/admin/categories' },
-  ];
+  const isMainDashboard = title === 'Admin Dashboard';
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -29,7 +22,7 @@ export function AdminLayout({ children, title, subtitle }: AdminLayoutProps) {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate('/profile')}
+              onClick={() => navigate(isMainDashboard ? '/profile' : '/admin')}
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -38,24 +31,9 @@ export function AdminLayout({ children, title, subtitle }: AdminLayoutProps) {
                 <h1 className="text-2xl font-bold">{title}</h1>
                 <Badge variant="secondary">Admin</Badge>
               </div>
-              {subtitle && <p className="text-muted-foreground">{subtitle}</p>}
+              {subtitle && <p className="text-muted-foreground text-sm">{subtitle}</p>}
             </div>
           </div>
-        </div>
-
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-          {navItems.map((item) => (
-            <Button
-              key={item.path}
-              variant={window.location.pathname === item.path ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => navigate(item.path)}
-              className="flex items-center gap-2 whitespace-nowrap"
-            >
-              <item.icon className="h-4 w-4" />
-              {item.label}
-            </Button>
-          ))}
         </div>
 
         {children}

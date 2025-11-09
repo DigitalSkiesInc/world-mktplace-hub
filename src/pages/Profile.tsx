@@ -10,7 +10,8 @@ import {
   LogOut,
   DollarSign,
   PlusCircle,
-  Wallet
+  Wallet,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -34,8 +35,26 @@ const Profile: React.FC = () => {
   const { data: favorites = [] } = useFavorites();
   const { data: userRole } = useUserRole();
   const isAdmin = userRole === 'admin';
+  const [suspendedCount, setSuspendedCount] = useState(0);
 
- 
+  useEffect(() => {
+    const fetchSuspendedCount = async () => {
+      if (!user?.id) return;
+      
+      const { data, error } = await supabase
+        .from('products')
+        .select('id')
+        .eq('seller_id', user.id)
+        .eq('status', 'suspended');
+      
+      if (!error && data) {
+        setSuspendedCount(data.length);
+      }
+    };
+    
+    fetchSuspendedCount();
+  }, [user]);
+
 
   const handleLogin = async () => {
     try {
@@ -92,6 +111,28 @@ const Profile: React.FC = () => {
   return (
     <div className="pb-20">
       <div className="px-4 py-6">
+        {/* Suspended Listings Warning */}
+        {suspendedCount > 0 && (
+          <Card className="mb-6 border-destructive bg-destructive/5 p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="font-semibold text-destructive">Action Required</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  You have {suspendedCount} suspended listing{suspendedCount > 1 ? 's' : ''} that need your attention
+                </p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/my-listings')}
+              >
+                Review Now
+              </Button>
+            </div>
+          </Card>
+        )}
+
         {/* Admin Access */}
         {isAdmin && (
           <Card className="p-4 mb-6 bg-gradient-primary">
