@@ -11,7 +11,9 @@ import {
   DollarSign,
   PlusCircle,
   Wallet,
-  AlertCircle
+  AlertCircle,
+  Mail,
+  Phone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -26,6 +28,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useNavigate } from 'react-router-dom';
 import { Settings } from 'lucide-react';
+import { usePlatformConfig } from '@/hooks/usePlatformConfig';
 
 const Profile: React.FC = () => {
   const { user, login, logout } = useWorldApp();
@@ -36,6 +39,8 @@ const Profile: React.FC = () => {
   const { data: userRole } = useUserRole();
   const isAdmin = userRole === 'admin';
   const [suspendedCount, setSuspendedCount] = useState(0);
+  const { data: platformConfig } = usePlatformConfig();
+  const supportContact = platformConfig?.support_contact || { email: null, phone: null };
 
   useEffect(() => {
     const fetchSuspendedCount = async () => {
@@ -250,6 +255,37 @@ const Profile: React.FC = () => {
             </Link>
           </div>
         </Card>
+
+        {/* Support Section */}
+        {(supportContact?.email || supportContact?.phone) && (
+          <Card className="p-4 mb-6">
+            <h3 className="font-semibold text-foreground mb-4">Support</h3>
+            <div className="space-y-2">
+              {supportContact.email && (
+                <a href={`mailto:${supportContact.email}`} className="block">
+                  <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
+                    <Mail size={20} className="text-muted-foreground" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">Email Support</p>
+                      <p className="text-xs text-muted-foreground">{supportContact.email}</p>
+                    </div>
+                  </div>
+                </a>
+              )}
+              {supportContact.phone && (
+                <a href={`tel:${supportContact.phone}`} className="block">
+                  <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
+                    <Phone size={20} className="text-muted-foreground" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">Phone Support</p>
+                      <p className="text-xs text-muted-foreground">{supportContact.phone}</p>
+                    </div>
+                  </div>
+                </a>
+              )}
+            </div>
+          </Card>
+        )}
 
         {/* Disconnect */}
         <Button

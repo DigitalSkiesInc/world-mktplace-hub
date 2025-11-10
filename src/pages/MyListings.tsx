@@ -273,25 +273,48 @@ export default function MyListings() {
           </Button>
 
           <Button onClick={() => navigate('/list-product')}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Listing
-          </Button>
-        </div>
+          <Plus className="mr-2 h-4 w-4" />
+          New Listing
+        </Button>
+      </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>My Listings</CardTitle>
-            <CardDescription>Manage your product listings</CardDescription>
+      {/* Suspended Listings Section - Appears at top if any exist */}
+      {suspendedListings.length > 0 && (
+        <Card className="mb-6 border-destructive bg-destructive/5">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-destructive" />
+              <div>
+                <CardTitle className="text-destructive">
+                  Action Required: {suspendedListings.length} Suspended Listing{suspendedListings.length > 1 ? 's' : ''}
+                </CardTitle>
+                <CardDescription className="text-destructive/80">
+                  These listings have been suspended and need your attention. Please review and fix the issues below.
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="all">
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="all">All ({listings.length})</TabsTrigger>
-                <TabsTrigger value="active">Active ({activeListings.length})</TabsTrigger>
-                <TabsTrigger value="paused">Paused ({pausedListings.length})</TabsTrigger>
-                <TabsTrigger value="inactive">Inactive ({inactiveListings.length})</TabsTrigger>
-                <TabsTrigger value="suspended">Suspended ({suspendedListings.length})</TabsTrigger>
-              </TabsList>
+          <CardContent className="space-y-4">
+            {suspendedListings.map(listing => (
+              <SuspendedListingCard key={listing.id} listing={listing} />
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>My Listings</CardTitle>
+          <CardDescription>Manage your product listings</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="all">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="all">All ({listings.length})</TabsTrigger>
+              <TabsTrigger value="active">Active ({activeListings.length})</TabsTrigger>
+              <TabsTrigger value="paused">Paused ({pausedListings.length})</TabsTrigger>
+              <TabsTrigger value="inactive">Inactive ({inactiveListings.length})</TabsTrigger>
+            </TabsList>
 
               <TabsContent value="all" className="space-y-4 mt-6">
                 {loading ? (
@@ -332,22 +355,14 @@ export default function MyListings() {
                 )}
               </TabsContent>
 
-              <TabsContent value="sold" className="space-y-4 mt-6">
-                {soldListings.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No sold listings</p>
-                ) : (
-                  soldListings.map(listing => <ListingCard key={listing.id} listing={listing} showActions={false} />)
-                )}
-              </TabsContent>
-
-              <TabsContent value="suspended" className="space-y-4 mt-6">
-                {suspendedListings.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No suspended listings</p>
-                ) : (
-                  suspendedListings.map(listing => <SuspendedListingCard key={listing.id} listing={listing} />)
-                )}
-              </TabsContent>
-            </Tabs>
+            <TabsContent value="sold" className="space-y-4 mt-6">
+              {soldListings.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No sold listings</p>
+              ) : (
+                soldListings.map(listing => <ListingCard key={listing.id} listing={listing} showActions={false} />)
+              )}
+            </TabsContent>
+          </Tabs>
           </CardContent>
         </Card>
 
