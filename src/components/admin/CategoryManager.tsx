@@ -20,7 +20,16 @@ export function CategoryManager() {
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   
-  const [formData, setFormData] = useState({ name: '', slug: '', icon: '📦' });
+  const [formData, setFormData] = useState({ name: '', icon: '📦' });
+
+
+  function generateSlug(name: string) {
+    return name
+      .toLowerCase()
+      .trim()
+      .replace(/[\s\W-]+/g, '-') // Replace spaces and non-word characters with hyphens
+      .replace(/^-+|-+$/g, ''); // Remove leading and trailing hyphens
+  }
 
   const { data: categories, isLoading } = useQuery({
     queryKey: ['categories'],
@@ -39,10 +48,10 @@ export function CategoryManager() {
   const deleteCategory = useDeleteCategory();
 
   const handleCreate = () => {
-    createCategory.mutate(formData, {
+    createCategory.mutate({...formData,slug:generateSlug(formData.name)}, {
       onSuccess: () => {
         setIsCreateOpen(false);
-        setFormData({ name: '', slug: '', icon: '📦' });
+        setFormData({ name: '', icon: '📦' });
       },
     });
   };
@@ -50,12 +59,12 @@ export function CategoryManager() {
   const handleEdit = () => {
     if (editingCategory) {
       updateCategory.mutate(
-        { id: editingCategory.id, updates: formData },
+        { id: editingCategory.id, updates: {...formData,slug:generateSlug(formData.name)}},
         {
           onSuccess: () => {
             setIsEditOpen(false);
             setEditingCategory(null);
-            setFormData({ name: '', slug: '', icon: '📦' });
+            setFormData({ name: '', icon: '📦' });
           },
         }
       );
@@ -64,7 +73,7 @@ export function CategoryManager() {
 
   const openEditDialog = (category: any) => {
     setEditingCategory(category);
-    setFormData({ name: category.name, slug: category.slug, icon: category.icon });
+    setFormData({ name: category.name, icon: category.icon });
     setIsEditOpen(true);
   };
 
@@ -104,14 +113,6 @@ export function CategoryManager() {
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
-              <div>
-                <Label htmlFor="slug">Slug</Label>
-                <Input
-                  id="slug"
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                />
-              </div>
               <Button onClick={handleCreate} className="w-full">Create Category</Button>
             </div>
           </DialogContent>
@@ -123,7 +124,6 @@ export function CategoryManager() {
             <TableRow>
               <TableHead>Icon</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Slug</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -132,9 +132,8 @@ export function CategoryManager() {
               <TableRow key={category.id}>
                 <TableCell className="text-2xl">{category.icon}</TableCell>
                 <TableCell>{category.name}</TableCell>
-                <TableCell>{category.slug}</TableCell>
                 <TableCell>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -156,7 +155,14 @@ export function CategoryManager() {
           </TableBody>
         </Table>
 
-        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <Dialog open={isEditOpen} onOpenChange={
+          (open) => {
+            if (!open) {
+              setIsEditOpen(false);
+               setFormData({ name: '', icon: '📦' });
+            }
+          }
+        }>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Edit Category</DialogTitle>
@@ -172,14 +178,6 @@ export function CategoryManager() {
                   id="edit-name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-slug">Slug</Label>
-                <Input
-                  id="edit-slug"
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                 />
               </div>
               <Button onClick={handleEdit} className="w-full">Update Category</Button>

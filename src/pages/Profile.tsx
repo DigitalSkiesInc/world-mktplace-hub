@@ -138,19 +138,6 @@ const Profile: React.FC = () => {
           </Card>
         )}
 
-        {/* Admin Access */}
-        {isAdmin && (
-          <Card className="p-4 mb-6 bg-gradient-primary">
-            <Button 
-              className="w-full bg-background text-foreground hover:bg-background/90"
-              onClick={() => navigate('/admin')}
-            >
-              <Settings className="mr-2" size={18} />
-              Manage Platform
-            </Button>
-          </Card>
-        )}
-
         {/* Profile Header */}
         <Card className="p-6 mb-6">
           <div className="flex items-center gap-4 mb-4">
@@ -182,7 +169,7 @@ const Profile: React.FC = () => {
           <Separator className="my-4" />
           
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {user.isSeller && (
               <div className="text-center">
                 <p className="text-2xl font-bold text-foreground">0</p>
@@ -193,12 +180,12 @@ const Profile: React.FC = () => {
               <p className="text-2xl font-bold text-foreground">{conversations.length}</p>
               <p className="text-xs text-muted-foreground">Chats</p>
             </div>
-            {(user.isSeller && user.rating) && (
+            {/* {(user.isSeller && user.rating) && (
               <div className="text-center">
                 <p className="text-2xl font-bold text-foreground">{user.rating.toFixed(1)}</p>
                 <p className="text-xs text-muted-foreground">Rating</p>
               </div>
-            )}
+            )} */}
           </div>
         </Card>
 
@@ -207,6 +194,15 @@ const Profile: React.FC = () => {
           <Card className="p-4 mb-6">
             <h3 className="font-semibold text-foreground mb-4">Quick Actions</h3>
             <div className="space-y-3">
+              {isAdmin && (
+              <Link to="/admin" className="block">
+                <Button variant="outline" className="w-full justify-start">
+                  <Settings className="mr-2" size={18} />
+                  Manage platform
+                </Button>
+              </Link>
+        )}
+
               <Link to="/list-product" className="block">
                 <Button variant="outline" className="w-full justify-start">
                   <PlusCircle className="mr-2" size={18} />
