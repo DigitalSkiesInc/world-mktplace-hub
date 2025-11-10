@@ -16,6 +16,8 @@ export const useListingPayment = () => {
     productId: string;
     sellerId: string;
     paymentType: string;
+    currency: string;
+    amount: number;
   }) => {
     const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/initiate-payment', {
       method: 'POST',

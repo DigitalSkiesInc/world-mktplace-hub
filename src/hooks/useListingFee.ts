@@ -6,14 +6,25 @@ export const useListingFee = () => {
     queryKey: ['listing-fee'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('payment_fees')
+        .from('platform_config')
         .select('*')
-        .eq('payment_type', 'listing_fee')
-        .eq('is_active', true)
-        .single();
+        .in('config_key', ['payment_currencies', 'listing_fee']);
       
       if (error) throw error;
-      return data;
+
+      const config: Record<string, any> = {};
+      data?.forEach((item) => {
+        config[item.config_key] = item.config_value;
+      });
+
+      // Extract available currencies from payment_currencies.default
+      const availableCurrencies = config.payment_currencies?.default || ['WLD'];
+      const fees = config.listing_fee || { WLD: 0.5, USDC: 1.0 };
+
+      return {
+        availableCurrencies, // e.g., ['WLD'] or ['WLD', 'USDC']
+        fees,                 // e.g., { WLD: 0.5, USDC: 1.0 }
+      };
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
