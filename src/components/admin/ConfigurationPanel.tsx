@@ -41,14 +41,7 @@ export function ConfigurationPanel() {
   const handleFeeChange = (symbol: string, value: string) => {
     setCurrencies((prev) => ({
       ...prev,
-      [symbol]: { ...prev[symbol], amount: parseFloat(value) },
-    }));
-  };
-
-   const handleWalletChange = (symbol: string, value: string) => {
-    setCurrencies((prev) => ({
-      ...prev,
-      [symbol]: { ...prev[symbol], wallet: value },
+      [symbol]: { ...prev[symbol], amount: parseFloat(value)},
     }));
   };
 
@@ -128,6 +121,9 @@ export function ConfigurationPanel() {
       <Card>
         <CardHeader>
           <CardTitle>Payment Configuration</CardTitle>
+          <CardDescription>
+            Configure listing fees, wallet address, and currency availability
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Currency Configuration List */}
@@ -198,16 +194,15 @@ export function ConfigurationPanel() {
                 className="font-mono text-sm"
               />
               <p className="text-xs text-muted-foreground">
-                Ethereum wallet address where all payments will be received
+                Wallet address where payments will be received
               </p>
             </div>
 
             {/* Info Alert about Whitelisting */}
             <Alert className="bg-blue-50 border-blue-200">
               <Info className="h-4 w-4 text-blue-600" />
-              <AlertTitle className="text-blue-900">Wallet Address Whitelisting Required</AlertTitle>
               <AlertDescription className="text-blue-800 text-sm">
-                If you update the wallet address, you must whitelist it in your{' '}
+                Ensure to whitelist any new walllet address in your{' '}
                 <a 
                   href="https://developer.worldcoin.org" 
                   target="_blank" 
@@ -216,7 +211,7 @@ export function ConfigurationPanel() {
                 >
                   Worldcoin Developer Portal
                 </a>{' '}
-                before it can receive payments.
+                so it can receive payments.
               </AlertDescription>
             </Alert>
           </div>
