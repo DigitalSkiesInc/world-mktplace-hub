@@ -2,13 +2,10 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-// Hardocoded values for testing. To be removed
-const VITE_PUBLIC_SUPABASE_URL = "https://iaigqtogtnajyopvwjij.supabase.co";
-const VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhaWdxdG9ndG5hanlvcHZ3amlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4NzYzODksImV4cCI6MjA3NDQ1MjM4OX0.XSD9_09RxOXz5n3LE9cWPzI3TbdSsNHmPVmi0e9l2-E"
 
 export const supabase = createClient<Database>(
-  VITE_PUBLIC_SUPABASE_URL, 
-  VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
+  import.meta.env.VITE_PUBLIC_SUPABASE_URL, 
+  import.meta.env.VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
 
   auth: {
     storage: localStorage,
