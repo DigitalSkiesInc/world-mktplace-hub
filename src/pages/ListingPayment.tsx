@@ -5,13 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useWorldApp } from '@/contexts/WorldAppContext';
 import { useListingPayment } from '@/hooks/useListingPayment';
-import { useListingFee } from '@/hooks/useListingFee';
+import { useListingFeePaymentConfig as useListingFeeConfig } from '@/hooks/useListingFeeConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { ref } from 'process';
-import { MiniKit, tokenToDecimals, Tokens, PayCommandInput } from '@worldcoin/minikit-js'
+import { MiniKit, tokenToDecimals, Tokens, PayCommandInput, Network } from '@worldcoin/minikit-js'
+import { To } from 'react-flags-select';
 
 export default function ListingPayment() {
   const { id } = useParams();
@@ -20,8 +23,9 @@ export default function ListingPayment() {
   const [product, setProduct] = useState<any>(null);
   const [sellerId, setSellerId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState<string>('USDC');
   const { initiatePayment, verifyPayment } = useListingPayment();
-  const { data: listingFee, isLoading: isFeeLoading } = useListingFee();
+  const { data: listingFeeConfig, isLoading: isListingFeeConfigLoading } = useListingFeeConfig();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -53,37 +57,46 @@ export default function ListingPayment() {
     }
   }, [id, user, navigate]);
 
+  // Initialize selected currency based on available currencies
+  useEffect(() => {
+    if(listingFeeConfig){
+      if('USDC' in listingFeeConfig && listingFeeConfig['USDC'].available === true ){
+      setSelectedCurrency('USDC');;
+    }
+    else{
+      const firstAvailable = Object.entries(listingFeeConfig).find(([_, value])=> value.available === true);
+      if(firstAvailable){
+        setSelectedCurrency(firstAvailable[0]);
+      }
+    }
+    }
+    
+  }, [listingFeeConfig]);
+
   const handlePayment = async () => {
-    if (!product || !sellerId || !user?.id || !listingFee) return;
+    if (!product || !sellerId || !user?.id || !listingFeeConfig) return;
 
     setProcessing(true);
 
     try {
-
-      // returns id and amount
+      console.log('pament details', product.id, sellerId, selectedCurrency);
       const paymentData = await initiatePayment({
         productId: product.id,
         sellerId: sellerId,
-        paymentType: listingFee.payment_type
+        paymentType: 'listing_payment_config',
+        currency: selectedCurrency
       });
 
       console.log("Payment Data:", paymentData);
 
-
-      // Implement payment with wildcoin for now have a delay to simulate payment processing
-
       const payload: PayCommandInput = {
         reference: paymentData.paymentId,
-        to: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', // Test address
+        to: paymentData.wallet,
         tokens: [
           {
-            symbol: Tokens.WLD,
-            token_amount: tokenToDecimals(paymentData.amount, Tokens.WLD).toString(),
+            symbol: Tokens[paymentData.currency as keyof typeof Tokens],
+            token_amount: tokenToDecimals(paymentData.amount,Tokens[paymentData.currency as keyof typeof Tokens]).toString(),
           },
-          // {
-          //   symbol: Tokens.USDC,
-          //   token_amount: tokenToDecimals(3, Tokens.USDC).toString(),
-          // },
         ],
         description: 'Listing Fee Payment',
       }
@@ -110,11 +123,20 @@ export default function ListingPayment() {
      
 
       if (finalPayload.status !== "success") {
-        // throw new Error(`Payment failed. ${finalPayload.error_code || 'Please try again.'}`);
+        throw new Error(`Payment failed. ${finalPayload.error_code || 'Please try again.'}`);
 
         // For testing purposes, simulate success even if failed
-        console.log("finalPayload status not success,", finalPayload);
-        finalPayload ={ status: "success", reference: paymentData.paymentId, error_code: null,transaction_id: "0xa5b02107433da9e2a450c433560be1db01963a9146c14eed076cbf2c61837d60"  };
+        // console.log("finalPayload status not success,", finalPayload);
+        // finalPayload = { 
+        //   status: "success", 
+        //   reference: paymentData.paymentId, 
+        //   transaction_id: "0xa5b02107433da9e2a450c433560be1db01963a9146c14eed076cbf2c61837d60",
+        //   transaction_status: "submitted",
+        //   from: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+        //   chain: Network.WorldChain,
+        //   timestamp: Date.now().toString(),
+        //   version: 1
+        // };
       }
 
       // Verify payment
@@ -147,7 +169,7 @@ export default function ListingPayment() {
     }
   };
 
-  if (!product || isFeeLoading) {
+  if (!product || isListingFeeConfigLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -155,7 +177,7 @@ export default function ListingPayment() {
     );
   }
 
-  if (!listingFee) {
+  if (!listingFeeConfig) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -206,10 +228,32 @@ export default function ListingPayment() {
 
                 <Separator />
 
+                {/* Currency Selector - Only show if multiple currencies available */}
+                {listingFeeConfig 
+                && Object.entries(listingFeeConfig).filter(([_, value]: any) => value.available).length>1 
+                && (
+                  <div className="space-y-3">
+                    <Label>Payment Currency</Label>
+                     <RadioGroup value={selectedCurrency} onValueChange={setSelectedCurrency}>
+                    {Object.entries(listingFeeConfig || {})
+                    .map(([symbol, info]) => (
+                          <div key={symbol} className="flex items-center space-x-2">
+                            <RadioGroupItem value={symbol} id={symbol} />
+                            <Label htmlFor={symbol} className="cursor-pointer font-normal">
+                              {info.label} - {info.amount} {info.symbol}
+                            </Label>
+                          </div>
+                        ))}
+                    </RadioGroup>
+                  </div>
+                )}
+
+                <Separator />
+
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Listing Fee</span>
-                    <span className="font-semibold">{listingFee.amount} {listingFee.currency}</span>
+                    <span className="font-semibold">{listingFeeConfig[selectedCurrency].amount} {selectedCurrency}</span>
                   </div>
                 </div>
 
@@ -217,7 +261,7 @@ export default function ListingPayment() {
 
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>{listingFee.amount} {listingFee.currency}</span>
+                  <span>{listingFeeConfig[selectedCurrency].amount} {selectedCurrency}</span>
                 </div>
               </div>
 
@@ -234,7 +278,7 @@ export default function ListingPayment() {
                 className="w-full"
                 size="lg"
                 onClick={handlePayment}
-                disabled={processing || !listingFee}
+                disabled={processing || !listingFeeConfig}
               >
                 {processing ? (
                   <>
@@ -242,7 +286,7 @@ export default function ListingPayment() {
                     Processing Payment...
                   </>
                 ) : (
-                  'Pay with Worldcoin'
+                  `Pay ${listingFeeConfig[selectedCurrency].amount} ${selectedCurrency}`
                 )}
               </Button>
 

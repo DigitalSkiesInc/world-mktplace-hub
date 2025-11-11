@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, MoreVertical, Edit, Trash2, Pause, Play } from 'lucide-react';
+import { ArrowLeft, Plus, MoreVertical, Edit, Trash2, Pause, Play, AlertCircle } from 'lucide-react';
+import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -77,6 +78,7 @@ export default function MyListings() {
       pending: 'outline',
       sold: 'destructive',
       paused: 'outline',
+      suspended: 'destructive',
     };
     
     return (
@@ -204,6 +206,56 @@ export default function MyListings() {
   const inactiveListings = listings.filter(l => l.status === 'inactive');
   const pausedListings = listings.filter(l => l.status === 'paused');
   const soldListings = listings.filter(l => l.status === 'sold');
+  const suspendedListings = listings.filter(l => l.status === 'suspended');
+
+  const SuspendedListingCard = ({ listing }: { listing: any }) => (
+    <Card className="border-destructive">
+      <CardContent className="p-4">
+        <div className="flex gap-4">
+          
+          <div className="flex-1">
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex-1">
+                <h3 className="font-semibold">{listing.title}</h3>
+                <p className="text-sm text-muted-foreground line-clamp-1">
+                  {listing.description}
+                </p>
+              </div>
+              <Badge variant="destructive">Suspended</Badge>
+            </div>
+            <p className="font-bold mb-3">
+              {listing.price} {listing.currency}
+            </p>
+          </div>
+        </div>
+        
+        <div className="bg-destructive/10 border-destructive border p-3 rounded-md mt-3">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-destructive mb-1">
+                Suspended on {listing.suspended_at ? format(new Date(listing.suspended_at), 'MMM dd, yyyy') : 'N/A'}
+              </p>
+              <p className="text-sm text-muted-foreground mb-2">
+                <strong>Reason:</strong> {listing.suspension_reason || 'No reason provided'}
+              </p>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/edit-product/${listing.id}`);
+                }}
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                Review & Edit Listing
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -215,24 +267,45 @@ export default function MyListings() {
           </Button>
 
           <Button onClick={() => navigate('/list-product')}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Listing
-          </Button>
-        </div>
+          <Plus className="mr-2 h-4 w-4" />
+          New Listing
+        </Button>
+      </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>My Listings</CardTitle>
-            <CardDescription>Manage your product listings</CardDescription>
+      {/* Suspended Listings Section - Appears at top if any exist */}
+      {suspendedListings.length > 0 && (
+        <Card className="mb-6 border-destructive bg-destructive/5">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-destructive" />
+              <div>
+                <CardTitle className="text-destructive text-1xl font-semibold">
+                  Action Required: {suspendedListings.length} Suspended Listing{suspendedListings.length > 1 ? 's' : ''}
+                </CardTitle>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="all">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="all">All ({listings.length})</TabsTrigger>
-                <TabsTrigger value="active">Active ({activeListings.length})</TabsTrigger>
-                <TabsTrigger value="paused">Paused ({pausedListings.length})</TabsTrigger>
-                <TabsTrigger value="inactive">Inactive ({inactiveListings.length})</TabsTrigger>
-              </TabsList>
+          <CardContent className="space-y-4">
+            {suspendedListings.map(listing => (
+              <SuspendedListingCard key={listing.id} listing={listing} />
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>My Listings</CardTitle>
+          <CardDescription>Manage your product listings</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="all">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="all">All ({listings.length})</TabsTrigger>
+              <TabsTrigger value="active">Active ({activeListings.length})</TabsTrigger>
+              <TabsTrigger value="paused">Paused ({pausedListings.length})</TabsTrigger>
+              <TabsTrigger value="inactive">Inactive ({inactiveListings.length})</TabsTrigger>
+            </TabsList>
 
               <TabsContent value="all" className="space-y-4 mt-6">
                 {loading ? (
@@ -273,14 +346,14 @@ export default function MyListings() {
                 )}
               </TabsContent>
 
-              <TabsContent value="sold" className="space-y-4 mt-6">
-                {soldListings.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No sold listings</p>
-                ) : (
-                  soldListings.map(listing => <ListingCard key={listing.id} listing={listing} showActions={false} />)
-                )}
-              </TabsContent>
-            </Tabs>
+            <TabsContent value="sold" className="space-y-4 mt-6">
+              {soldListings.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No sold listings</p>
+              ) : (
+                soldListings.map(listing => <ListingCard key={listing.id} listing={listing} showActions={false} />)
+              )}
+            </TabsContent>
+          </Tabs>
           </CardContent>
         </Card>
 

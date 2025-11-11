@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       categories: {
@@ -209,6 +184,7 @@ export type Database = {
       }
       listing_payments: {
         Row: {
+          admin_notes: string | null
           amount: number
           created_at: string
           currency: string | null
@@ -216,9 +192,12 @@ export type Database = {
           payment_status: string
           product_id: string
           seller_id: string
+          status_updated_at: string | null
+          status_updated_by: string | null
           updated_at: string
         }
         Insert: {
+          admin_notes?: string | null
           amount: number
           created_at?: string
           currency?: string | null
@@ -226,9 +205,12 @@ export type Database = {
           payment_status?: string
           product_id: string
           seller_id: string
+          status_updated_at?: string | null
+          status_updated_by?: string | null
           updated_at?: string
         }
         Update: {
+          admin_notes?: string | null
           amount?: number
           created_at?: string
           currency?: string | null
@@ -236,6 +218,8 @@ export type Database = {
           payment_status?: string
           product_id?: string
           seller_id?: string
+          status_updated_at?: string | null
+          status_updated_by?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -344,6 +328,36 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_config: {
+        Row: {
+          config_key: string
+          config_value: Json
+          created_at: string | null
+          description: string | null
+          id: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          config_key: string
+          config_value: Json
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          config_key?: string
+          config_value?: Json
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category_id: string
@@ -357,6 +371,9 @@ export type Database = {
           price: number
           seller_id: string | null
           status: string
+          suspended_at: string | null
+          suspended_by: string | null
+          suspension_reason: string | null
           title: string
           updated_at: string
           views: number
@@ -373,6 +390,9 @@ export type Database = {
           price: number
           seller_id?: string | null
           status?: string
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspension_reason?: string | null
           title: string
           updated_at?: string
           views?: number
@@ -389,6 +409,9 @@ export type Database = {
           price?: number
           seller_id?: string | null
           status?: string
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspension_reason?: string | null
           title?: string
           updated_at?: string
           views?: number
@@ -491,6 +514,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       products_with_sellers: {
@@ -589,9 +633,20 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -717,10 +772,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

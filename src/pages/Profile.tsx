@@ -10,7 +10,10 @@ import {
   LogOut,
   DollarSign,
   PlusCircle,
-  Wallet
+  Wallet,
+  AlertCircle,
+  Mail,
+  Phone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -22,14 +25,44 @@ import { listingFees } from '@/data/mockData';
 import { supabase } from '@/integrations/supabase/client';
 import { useConversations } from '@/hooks/useConversations';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useNavigate } from 'react-router-dom';
+import { Settings } from 'lucide-react';
+import { usePlatformConfig } from '@/hooks/usePlatformConfig';
 
 const Profile: React.FC = () => {
   const { user, login, logout } = useWorldApp();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { data: conversations = [] } = useConversations();
   const { data: favorites = [] } = useFavorites();
+  const { data: userRole } = useUserRole();
+  const isAdmin = userRole === 'admin';
+  const [listingCount, setListingCount] = useState(0);
+  const [suspendedCount, setSuspendedCount] = useState(0);
+  const { data: platformConfig } = usePlatformConfig();
+  const supportContact = platformConfig?.support_contact || { email: null, phone: null };
 
- 
+  useEffect(() => {
+    const fetchSuspendedCount = async () => {
+      if (!user?.id) return;
+      
+      const { data, error } = await supabase
+        .from('products')
+        .select('id,status')
+        .eq('seller_id', user.id)
+        // .eq('status', 'suspended');
+      
+      if (!error && data) {
+        setListingCount(data.length);
+        const suspended=data.filter(item => item.status === 'suspended')
+        setSuspendedCount(suspended.length);
+      }
+    };
+    
+    fetchSuspendedCount();
+  }, [user]);
+
 
   const handleLogin = async () => {
     try {
@@ -86,6 +119,28 @@ const Profile: React.FC = () => {
   return (
     <div className="pb-20">
       <div className="px-4 py-6">
+        {/* Suspended Listings Warning */}
+        {suspendedCount > 0 && (
+          <Card className="mb-6 border-destructive bg-destructive/5 p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="font-semibold text-destructive">Action Required</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  You have {suspendedCount} suspended listing{suspendedCount > 1 ? 's' : ''} that need your attention
+                </p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/my-listings')}
+              >
+                Review Now
+              </Button>
+            </div>
+          </Card>
+        )}
+
         {/* Profile Header */}
         <Card className="p-6 mb-6">
           <div className="flex items-center gap-4 mb-4">
@@ -117,10 +172,10 @@ const Profile: React.FC = () => {
           <Separator className="my-4" />
           
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {user.isSeller && (
               <div className="text-center">
-                <p className="text-2xl font-bold text-foreground">0</p>
+                <p className="text-2xl font-bold text-foreground">{listingCount}</p>
                 <p className="text-xs text-muted-foreground">Listings</p>
               </div>
             )}
@@ -128,12 +183,12 @@ const Profile: React.FC = () => {
               <p className="text-2xl font-bold text-foreground">{conversations.length}</p>
               <p className="text-xs text-muted-foreground">Chats</p>
             </div>
-            {(user.isSeller && user.rating) && (
+            {/* {(user.isSeller && user.rating) && (
               <div className="text-center">
                 <p className="text-2xl font-bold text-foreground">{user.rating.toFixed(1)}</p>
                 <p className="text-xs text-muted-foreground">Rating</p>
               </div>
-            )}
+            )} */}
           </div>
         </Card>
 
@@ -142,6 +197,15 @@ const Profile: React.FC = () => {
           <Card className="p-4 mb-6">
             <h3 className="font-semibold text-foreground mb-4">Quick Actions</h3>
             <div className="space-y-3">
+              {isAdmin && (
+              <Link to="/admin" className="block">
+                <Button variant="outline" className="w-full justify-start">
+                  <Settings className="mr-2" size={18} />
+                  Manage platform
+                </Button>
+              </Link>
+        )}
+
               <Link to="/list-product" className="block">
                 <Button variant="outline" className="w-full justify-start">
                   <PlusCircle className="mr-2" size={18} />
@@ -157,22 +221,7 @@ const Profile: React.FC = () => {
             </div>
           </Card>
         )}
-
-        {/* Total Earnings - Only show if user has seller profile */}
-        {user.isSeller && (
-          <Card className="p-4 mb-6 bg-gradient-primary">
-            <div className="flex items-center justify-between text-white">
-              <div>
-                <p className="text-sm opacity-90 mb-1">Total Earnings</p>
-                <p className="text-2xl font-bold">0 WLD</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <TrendingUp size={24} />
-              </div>
-            </div>
-          </Card>
-        )}
-
+       
         {/* Navigation Links */}
         <Card className="p-4 mb-6">
           <h3 className="font-semibold text-foreground mb-4">Account</h3>
@@ -205,6 +254,37 @@ const Profile: React.FC = () => {
             </Link>
           </div>
         </Card>
+
+        {/* Support Section */}
+        {(supportContact?.email || supportContact?.phone) && (
+          <Card className="p-4 mb-6">
+            <h3 className="font-semibold text-foreground mb-4">Support</h3>
+            <div className="space-y-2">
+              {supportContact.email && (
+                <a href={`mailto:${supportContact.email}`} className="block">
+                  <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
+                    <Mail size={20} className="text-muted-foreground" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">Email Support</p>
+                      <p className="text-xs text-muted-foreground">{supportContact.email}</p>
+                    </div>
+                  </div>
+                </a>
+              )}
+              {supportContact.phone && (
+                <a href={`tel:${supportContact.phone}`} className="block">
+                  <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
+                    <Phone size={20} className="text-muted-foreground" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">Phone Support</p>
+                      <p className="text-xs text-muted-foreground">{supportContact.phone}</p>
+                    </div>
+                  </div>
+                </a>
+              )}
+            </div>
+          </Card>
+        )}
 
         {/* Disconnect */}
         <Button

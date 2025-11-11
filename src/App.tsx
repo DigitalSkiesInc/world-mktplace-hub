@@ -25,6 +25,12 @@ import EditProfile from "./pages/EditProfile";
 import EditProduct from "./pages/EditProduct";
 import Favorites from "./pages/Favorites";
 import MiniKitProvider from "./providers//minikit-provider";
+import Admin from "./pages/Admin";
+import AdminConfig from "./pages/admin/AdminConfig";
+import AdminPayments from "./pages/admin/AdminPayments";
+import AdminListings from "./pages/admin/AdminListings";
+import AdminCategories from "./pages/admin/AdminCategories";
+import { useUserRole } from "./hooks/useUserRole";
 
 
 const queryClient = new QueryClient();
@@ -46,11 +52,24 @@ function ProtectedLayout() {
   : <Navigate to="/login" replace />;
 }
 
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useWorldApp();
+  const { data: userRole, isLoading: roleLoading } = useUserRole();
+  
+  if (isLoading || roleLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+  
+  if (!user) return <Navigate to="/login" replace />;
+  if (userRole !== 'admin') return <Navigate to="/" replace />;
+  
+  return <>{children}</>;
+}
 
-
-
-
- 
 
 // import('eruda').then((module) => {
 //         module.default.init();
@@ -84,6 +103,11 @@ const App = () => (
               <Route path="/my-listings" element={<MyListings />} />
               <Route path="/edit-product/:id" element={<EditProduct />} />
               <Route path="/favorites" element={<Favorites />} />
+              <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+              <Route path="/admin/config" element={<AdminRoute><AdminConfig /></AdminRoute>} />
+              <Route path="/admin/payments" element={<AdminRoute><AdminPayments /></AdminRoute>} />
+              <Route path="/admin/listings" element={<AdminRoute><AdminListings /></AdminRoute>} />
+              <Route path="/admin/categories" element={<AdminRoute><AdminCategories /></AdminRoute>} />
               </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
