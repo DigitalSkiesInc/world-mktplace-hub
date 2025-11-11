@@ -76,9 +76,9 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 
  
 
-// import('eruda').then((module) => {
-//         module.default.init();
-//       });
+import('eruda').then((module) => {
+        module.default.init();
+      });
 
 
 const App = () => (

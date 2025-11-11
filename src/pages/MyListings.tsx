@@ -285,12 +285,9 @@ export default function MyListings() {
             <div className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-destructive" />
               <div>
-                <CardTitle className="text-destructive">
+                <CardTitle className="text-destructive text-1xl font-semibold">
                   Action Required: {suspendedListings.length} Suspended Listing{suspendedListings.length > 1 ? 's' : ''}
                 </CardTitle>
-                <CardDescription className="text-destructive/80">
-                  These listings have been suspended and need your attention. Please review and fix the issues below.
-                </CardDescription>
               </div>
             </div>
           </CardHeader>
