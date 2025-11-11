@@ -80,7 +80,7 @@ export default function ListingPayment() {
 
     try {
       // Validate wallet address is configured
-      const walletAddress = listingFeeConfig[selectedCurrency]?.wallet;
+      const walletAddress = listingFeeConfig.wallet;
       if (!walletAddress) {
         toast({
           title: 'Configuration Error',

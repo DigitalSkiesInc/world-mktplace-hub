@@ -16,11 +16,15 @@ export function ConfigurationPanel() {
   const updateConfig = useUpdatePlatformConfig();
 
   const [currencies, setCurrencies] = useState<Record<string, any>>({});
+  const [wallet, setWallet] = useState('');
   const [supportContact, setSupportContact] = useState({ email: '', phone: '' });
 
   useEffect(() => {
     if (config?.listing_payment_config?.currencies) {
       setCurrencies(config.listing_payment_config.currencies);
+    }
+    if (config?.listing_payment_config?.wallet) {
+      setWallet(config.listing_payment_config.wallet);
     }
     if (config?.support_contact) {
       setSupportContact(config.support_contact);
@@ -41,28 +45,29 @@ export function ConfigurationPanel() {
     }));
   };
 
-  const handleWalletChange = (symbol: string, value: string) => {
-    setCurrencies((prev) => ({
-      ...prev,
-      [symbol]: { ...prev[symbol], wallet: value },
-    }));
-  };
-
   const saveCurrencies = () => {
-    // Validate wallet addresses for available currencies
+    // Validate wallet address
     const errors: string[] = [];
     
+    // Check if any currency is available
+    const hasAvailableCurrency = Object.values(currencies).some(
+      (config: any) => config.available
+    );
+    
+    if (hasAvailableCurrency) {
+      // Check if wallet is set
+      if (!wallet || wallet.trim() === '') {
+        errors.push('Wallet address is required when currencies are enabled');
+      }
+      // Check if wallet format is valid (basic Ethereum address check)
+      else if (!/^0x[a-fA-F0-9]{40}$/.test(wallet)) {
+        errors.push('Invalid wallet address format');
+      }
+    }
+    
+    // Validate fees for available currencies
     Object.entries(currencies).forEach(([symbol, config]: [string, any]) => {
       if (config.available) {
-        // Check if wallet is set
-        if (!config.wallet || config.wallet.trim() === '') {
-          errors.push(`${config.label}: Wallet address is required`);
-        }
-        // Check if wallet format is valid (basic Ethereum address check)
-        else if (!/^0x[a-fA-F0-9]{40}$/.test(config.wallet)) {
-          errors.push(`${config.label}: Invalid wallet address format`);
-        }
-        
         // Check if amount is valid
         if (!config.amount || config.amount <= 0) {
           errors.push(`${config.label}: Listing fee must be greater than 0`);
@@ -89,7 +94,7 @@ export function ConfigurationPanel() {
     // Save if validation passes
     updateConfig.mutate({
       key: 'listing_payment_config',
-      value: { currencies },
+      value: { currencies, wallet },
     });
   };
 
@@ -117,35 +122,17 @@ export function ConfigurationPanel() {
         <CardHeader>
           <CardTitle>Payment Configuration</CardTitle>
           <CardDescription>
-            Configure listing fees, wallet addresses, and currency availability
+            Configure listing fees, wallet address, and currency availability
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Info Alert about Whitelisting */}
-          <Alert className="bg-blue-50 border-blue-200">
-            <Info className="h-4 w-4 text-blue-600" />
-            <AlertTitle className="text-blue-900">Wallet Address Whitelisting Required</AlertTitle>
-            <AlertDescription className="text-blue-800 text-sm">
-              If you update wallet addresses, you must whitelist the new addresses in your{' '}
-              <a 
-                href="https://developer.worldcoin.org" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="underline font-medium hover:text-blue-900"
-              >
-                Worldcoin Developer Portal
-              </a>{' '}
-              before they can receive payments.
-            </AlertDescription>
-          </Alert>
-
           {/* Currency Configuration List */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {currencyKeys.map((symbol) => (
               <Card key={symbol} className="border-2">
                 <CardContent className="p-4">
                   {/* Currency Header with Checkbox */}
-                  <div className="flex items-center space-x-3 mb-4 pb-3 border-b">
+                  <div className="flex items-center space-x-3 pb-3 border-b">
                     <Checkbox
                       id={`available-${symbol}`}
                       checked={currencies[symbol].available}
@@ -166,7 +153,7 @@ export function ConfigurationPanel() {
 
                   {/* Currency Details - Only show if available */}
                   {currencies[symbol].available && (
-                    <div className="space-y-4 pl-8">
+                    <div className="mt-4 pl-8">
                       {/* Listing Fee Input */}
                       <div className="grid gap-2">
                         <Label htmlFor={`fee-${symbol}`} className="text-sm font-medium">
@@ -185,29 +172,49 @@ export function ConfigurationPanel() {
                           Amount in {currencies[symbol].symbol}
                         </p>
                       </div>
-
-                      {/* Wallet Address Input */}
-                      <div className="grid gap-2">
-                        <Label htmlFor={`wallet-${symbol}`} className="text-sm font-medium">
-                          Receiving Wallet Address
-                        </Label>
-                        <Input
-                          id={`wallet-${symbol}`}
-                          type="text"
-                          placeholder="0x..."
-                          value={currencies[symbol].wallet || ''}
-                          onChange={(e) => handleWalletChange(symbol, e.target.value)}
-                          className="font-mono text-sm"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Ethereum wallet address where {currencies[symbol].symbol} payments will be received
-                        </p>
-                      </div>
                     </div>
                   )}
                 </CardContent>
               </Card>
             ))}
+          </div>
+
+          {/* Wallet Address Section */}
+          <div className="space-y-4 pt-2">
+            <div className="grid gap-2">
+              <Label htmlFor="wallet-address" className="text-sm font-medium">
+                Receiving Wallet Address
+              </Label>
+              <Input
+                id="wallet-address"
+                type="text"
+                placeholder="0x..."
+                value={wallet}
+                onChange={(e) => setWallet(e.target.value)}
+                className="font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">
+                Ethereum wallet address where all payments will be received
+              </p>
+            </div>
+
+            {/* Info Alert about Whitelisting */}
+            <Alert className="bg-blue-50 border-blue-200">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-blue-900">Wallet Address Whitelisting Required</AlertTitle>
+              <AlertDescription className="text-blue-800 text-sm">
+                If you update the wallet address, you must whitelist it in your{' '}
+                <a 
+                  href="https://developer.worldcoin.org" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="underline font-medium hover:text-blue-900"
+                >
+                  Worldcoin Developer Portal
+                </a>{' '}
+                before it can receive payments.
+              </AlertDescription>
+            </Alert>
           </div>
 
           {/* Save Button */}
