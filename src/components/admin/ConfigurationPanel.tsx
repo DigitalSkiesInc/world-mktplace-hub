@@ -41,7 +41,14 @@ export function ConfigurationPanel() {
   const handleFeeChange = (symbol: string, value: string) => {
     setCurrencies((prev) => ({
       ...prev,
-      [symbol]: { ...prev[symbol], amount: parseFloat(value) || 0 },
+      [symbol]: { ...prev[symbol], amount: parseFloat(value) },
+    }));
+  };
+
+   const handleWalletChange = (symbol: string, value: string) => {
+    setCurrencies((prev) => ({
+      ...prev,
+      [symbol]: { ...prev[symbol], wallet: value },
     }));
   };
 
@@ -121,9 +128,6 @@ export function ConfigurationPanel() {
       <Card>
         <CardHeader>
           <CardTitle>Payment Configuration</CardTitle>
-          <CardDescription>
-            Configure listing fees, wallet address, and currency availability
-          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Currency Configuration List */}
@@ -218,7 +222,7 @@ export function ConfigurationPanel() {
           </div>
 
           {/* Save Button */}
-          <Button onClick={saveCurrencies} size="lg" className="w-full">
+          <Button onClick={saveCurrencies} className="w-full">
             Save Payment Configuration
           </Button>
         </CardContent>
@@ -256,7 +260,7 @@ export function ConfigurationPanel() {
               />
             </div>
           </div>
-          <Button onClick={saveSupportContact} disabled={!supportContact.email}>
+          <Button onClick={saveSupportContact} disabled={!supportContact.email} className="w-full">
             Save Support Contact
           </Button>
         </CardContent>

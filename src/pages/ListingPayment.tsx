@@ -79,30 +79,6 @@ export default function ListingPayment() {
     setProcessing(true);
 
     try {
-      // Validate wallet address is configured
-      const walletAddress = listingFeeConfig.wallet;
-      if (!walletAddress) {
-        toast({
-          title: 'Configuration Error',
-          description: 'Payment wallet address is not configured. Please contact support.',
-          variant: 'destructive',
-        });
-        setProcessing(false);
-        return;
-      }
-
-      // Validate wallet address format (basic Ethereum address check)
-      if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
-        toast({
-          title: 'Configuration Error',
-          description: 'Invalid payment wallet address. Please contact support.',
-          variant: 'destructive',
-        });
-        setProcessing(false);
-        return;
-      }
-
-      // Pass currency and amount to backend
       console.log('pament details', product.id, sellerId, selectedCurrency);
       const paymentData = await initiatePayment({
         productId: product.id,
@@ -113,13 +89,9 @@ export default function ListingPayment() {
 
       console.log("Payment Data:", paymentData);
 
-      if(!paymentData || !paymentData.paymentId || paymentData.amount === undefined || !paymentData.currency){
-        throw new Error('Error initiating payment');
-      }
-
       const payload: PayCommandInput = {
         reference: paymentData.paymentId,
-        to: walletAddress,
+        to: paymentData.wallet,
         tokens: [
           {
             symbol: Tokens[paymentData.currency as keyof typeof Tokens],

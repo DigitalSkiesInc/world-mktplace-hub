@@ -41,7 +41,7 @@ export const signInUser = async ({
   profilePictureUrl?: string;
 }, nonce: string) => {
   try {
-    const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/signin', {
+    const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/v1/signin', {
       method: 'POST',
       credentials: "include",
       headers: { 'Content-Type': 'application/json' },

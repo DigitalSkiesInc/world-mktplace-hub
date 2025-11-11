@@ -18,7 +18,7 @@ export const useListingPayment = () => {
     paymentType: string;
     currency: string;
   }) => {
-    const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/initiate-payment', {
+    const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/v1/initiate-payment', {
       method: 'POST',
       credentials: "include",
       headers: { 'Content-Type': 'application/json' },
@@ -27,12 +27,15 @@ export const useListingPayment = () => {
       );
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Payment initiation failed');
+    if(!data || !data.paymentId || data.amount === undefined || !data.currency || !data.wallet){
+        throw new Error('Error initiating payment');
+      }
     return data;
     }
 
 
    const verifyPayment = async (transactionDetails) => {
-    const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/verify-payment', {
+    const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/v1/verify-payment', {
       method: 'POST',
       credentials: "include",
       headers: { 'Content-Type': 'application/json' },

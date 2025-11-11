@@ -38,6 +38,7 @@ const Profile: React.FC = () => {
   const { data: favorites = [] } = useFavorites();
   const { data: userRole } = useUserRole();
   const isAdmin = userRole === 'admin';
+  const [listingCount, setListingCount] = useState(0);
   const [suspendedCount, setSuspendedCount] = useState(0);
   const { data: platformConfig } = usePlatformConfig();
   const supportContact = platformConfig?.support_contact || { email: null, phone: null };
@@ -48,12 +49,14 @@ const Profile: React.FC = () => {
       
       const { data, error } = await supabase
         .from('products')
-        .select('id')
+        .select('id,status')
         .eq('seller_id', user.id)
-        .eq('status', 'suspended');
+        // .eq('status', 'suspended');
       
       if (!error && data) {
-        setSuspendedCount(data.length);
+        setListingCount(data.length);
+        const suspended=data.filter(item => item.status === 'suspended')
+        setSuspendedCount(suspended.length);
       }
     };
     
@@ -172,7 +175,7 @@ const Profile: React.FC = () => {
           <div className="grid grid-cols-2 gap-4">
             {user.isSeller && (
               <div className="text-center">
-                <p className="text-2xl font-bold text-foreground">0</p>
+                <p className="text-2xl font-bold text-foreground">{listingCount}</p>
                 <p className="text-xs text-muted-foreground">Listings</p>
               </div>
             )}

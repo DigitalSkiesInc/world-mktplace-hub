@@ -212,13 +212,7 @@ export default function MyListings() {
     <Card className="border-destructive">
       <CardContent className="p-4">
         <div className="flex gap-4">
-          {listing.images?.[0] && (
-            <img
-              src={listing.images[0]}
-              alt={listing.title}
-              className="w-20 h-20 object-cover rounded-md"
-            />
-          )}
+          
           <div className="flex-1">
             <div className="flex items-start justify-between mb-2">
               <div className="flex-1">

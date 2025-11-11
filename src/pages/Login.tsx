@@ -65,7 +65,7 @@ export default function Login() {
 
 
 
-      const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/nonce',
+      const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/v1/nonce',
         {
           credentials: "include",
           method: 'GET',
