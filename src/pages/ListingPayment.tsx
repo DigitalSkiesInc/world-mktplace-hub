@@ -79,6 +79,28 @@ export default function ListingPayment() {
     setProcessing(true);
 
     try {
+      // Validate wallet address is configured
+      const walletAddress = listingFeeConfig[selectedCurrency]?.wallet;
+      if (!walletAddress) {
+        toast({
+          title: 'Configuration Error',
+          description: 'Payment wallet address is not configured. Please contact support.',
+          variant: 'destructive',
+        });
+        setProcessing(false);
+        return;
+      }
+
+      // Validate wallet address format (basic Ethereum address check)
+      if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+        toast({
+          title: 'Configuration Error',
+          description: 'Invalid payment wallet address. Please contact support.',
+          variant: 'destructive',
+        });
+        setProcessing(false);
+        return;
+      }
 
       // Pass currency and amount to backend
       console.log('pament details', product.id, sellerId, selectedCurrency);
@@ -97,7 +119,7 @@ export default function ListingPayment() {
 
       const payload: PayCommandInput = {
         reference: paymentData.paymentId,
-        to: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', // Test address
+        to: walletAddress,
         tokens: [
           {
             symbol: Tokens[paymentData.currency as keyof typeof Tokens],
