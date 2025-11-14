@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Plus, TrendingUp, Eye } from 'lucide-react';
+import { Search, Plus, TrendingUp, Eye, Shield } from 'lucide-react';
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,19 +9,24 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useWorldApp } from '@/contexts/WorldAppContext';
+import { CountryFilter } from '@/components/CountryFilter';
+import { useCountryFilter } from '@/hooks/useCountryFilter';
 import heroImage from '@/assets/marketplace-hero.jpg';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useWorldApp();
   const [searchQuery, setSearchQuery] = React.useState('');
+  const { selectedCountry, detectedCountry, isLoading: countryLoading, handleCountryChange } = useCountryFilter();
   
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   const { data: featuredProducts = [], isLoading: featuredLoading } = useProducts({ 
-    sortBy: 'newest' 
+    sortBy: 'newest',
+    country: selectedCountry 
   });
   const { data: recentProducts = [], isLoading: recentLoading } = useProducts({ 
-    sortBy: 'newest' 
+    sortBy: 'newest',
+    country: selectedCountry 
   });
 
   const handleSearch = (e: React.FormEvent) => {
@@ -86,6 +91,37 @@ const Home: React.FC = () => {
           />
         </div>
       </section>
+
+      {/* Buyer's Guide Banner */}
+      <div className="px-4 py-3 bg-blue-50 dark:bg-blue-950/20 border-y border-blue-200 dark:border-blue-800">
+        <div className="flex items-center justify-between max-w-2xl mx-auto">
+          <div className="flex items-center gap-3">
+            <Shield className="text-blue-600 dark:text-blue-400" size={20} />
+            <div>
+              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                New to buying on World Marketplace?
+              </p>
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                Learn how to shop safely and effectively
+              </p>
+            </div>
+          </div>
+          <Link to="/buyer-guide">
+            <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
+              Learn More
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Country Filter */}
+      {!countryLoading && (
+        <CountryFilter
+          selectedCountry={selectedCountry}
+          detectedCountry={detectedCountry}
+          onCountryChange={handleCountryChange}
+        />
+      )}
 
       <div className="px-4 py-6 space-y-8">
         {/* Categories Grid */}

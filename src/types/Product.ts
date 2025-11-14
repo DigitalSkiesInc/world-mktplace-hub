@@ -21,6 +21,7 @@ export interface Product {
   status: 'active' | 'sold' | 'pending' | 'inactive';
   views: number;
   isFeatured: boolean;
+  externalLink?: string;
 }
 
 export interface ProductCategory {
@@ -46,6 +47,7 @@ export interface DbProduct {
   status: 'active' | 'sold' | 'pending' | 'inactive';
   views: number;
   is_featured: boolean;
+  external_link?: string;
 }
 
 export interface DbCategory {

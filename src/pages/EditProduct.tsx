@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, Loader2, Upload, X } from 'lucide-react';
+import { ArrowLeft, Loader2, Upload, X, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -24,6 +24,7 @@ const editProductSchema = z.object({
   currency: z.enum(['WLD', 'USD']),
   category_id: z.string().min(1, 'Category is required'),
   condition: z.enum(['new', 'second-hand']),
+  external_link: z.string().url('Must be a valid URL').optional().or(z.literal(''))
 });
 
 type EditProductFormData = z.infer<typeof editProductSchema>;
@@ -86,6 +87,7 @@ export default function EditProduct() {
         currency: productData.currency as 'WLD' | 'USD',
         category_id: productData.category_id,
         condition: productData.condition as 'new' | 'second-hand',
+        external_link: productData.external_link || '',
       });
     } catch (error: any) {
       toast({
@@ -140,6 +142,7 @@ export default function EditProduct() {
         id,
         description: data.description,
         price: data.price,
+        external_link: data.external_link || null,
       };
 
       // If inactive, allow full edit
@@ -325,6 +328,31 @@ export default function EditProduct() {
                         </SelectContent>
                       </Select>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="external_link"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>External Link (Optional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="https://instagram.com/yourstore..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 mt-2">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                          <p className="text-xs text-amber-700 dark:text-amber-300">
+                            <strong>Warning:</strong> Suspicious or misleading links may result in your listing being banned.
+                          </p>
+                        </div>
+                      </div>
                     </FormItem>
                   )}
                 />
