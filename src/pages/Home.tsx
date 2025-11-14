@@ -1,26 +1,28 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Plus, TrendingUp } from 'lucide-react';
+import { Search, Plus, TrendingUp, Eye } from 'lucide-react';
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card';
 import { useProducts, useCategories } from '@/hooks/useProducts';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useWorldApp } from '@/contexts/WorldAppContext';
 import heroImage from '@/assets/marketplace-hero.jpg';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useWorldApp();
-
-  const [selectedCountry, setSelectedCountry] = React.useState('KE')
-
   const [searchQuery, setSearchQuery] = React.useState('');
-
+  
   const { data: categories, isLoading: categoriesLoading } = useCategories();
-  const { data: featuredProducts = [], isLoading: featuredLoading } = useProducts({ sortBy: 'newest' });
-  const { data: recentProducts = [], isLoading: recentLoading } = useProducts({ sortBy: 'newest' });
+  const { data: featuredProducts = [], isLoading: featuredLoading } = useProducts({ 
+    sortBy: 'newest' 
+  });
+  const { data: recentProducts = [], isLoading: recentLoading } = useProducts({ 
+    sortBy: 'newest' 
+  });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,30 +31,29 @@ const Home: React.FC = () => {
     }
   };
 
-  const openCountrySelector = () => {
-    // TODO: Open your modal or sheet to select a new country.
-    console.log('Open country selector');
-  };
-
   return (
     <div className="pb-20">
       {/* Hero Section */}
       <section className="relative bg-gradient-marketplace overflow-hidden">
         <div className="relative px-4 py-8">
           <div className="max-w-md mx-auto text-center">
-            <h1 className="text-3xl font-bold text-foreground mb-2">World Marketplace</h1>
-            <p className="text-muted-foreground mb-6">Buy and sell with verified World ID users</p>
-
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              World Marketplace
+            </h1>
+            <p className="text-muted-foreground mb-6">
+              Buy and sell with verified World ID users
+            </p>
+            
             {/* Search Bar */}
             <form onSubmit={handleSearch} className="relative mb-6 flex">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
-                <Input
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-card border-border"
-                />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
+              <Input
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-card border-border"
+              />
               </div>
               <Button type="submit" className="ml-3 bg-gradient-primary hover:shadow-glow">
                 Search
@@ -68,7 +69,9 @@ const Home: React.FC = () => {
                 </Button>
               </Link>
               <Link to="/categories">
-                <Button variant="outline">Browse Categories</Button>
+                <Button variant="outline">
+                  Browse Categories
+                </Button>
               </Link>
             </div>
           </div>
@@ -84,28 +87,6 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* ---------------------------------------------------------------- */}
-      {/* Country Filter Bar (Option #2 Implementation)                  */}
-      {/* ---------------------------------------------------------------- */}
-      {selectedCountry && (
-        <div className="sticky top-0 z-30 bg-background border-b border-border px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-sm px-3 py-1">
-              📍 Showing products from: {selectedCountry}
-            </Badge>
-
-            <Button variant="link" size="sm" onClick={openCountrySelector}>
-              Change
-            </Button>
-          </div>
-
-          <Button variant="ghost" size="sm" >
-            Clear
-          </Button>
-        </div>
-      )}
-      {/* ---------------------------------------------------------------- */}
-
       <div className="px-4 py-6 space-y-8">
         {/* Categories Grid */}
         <section>
@@ -115,7 +96,7 @@ const Home: React.FC = () => {
               <Button variant="ghost" size="sm">View All</Button>
             </Link>
           </div>
-
+          
           {categoriesLoading ? (
             <div className="grid grid-cols-4 gap-3">
               {Array.from({ length: 8 }).map((_, i) => (
@@ -131,7 +112,9 @@ const Home: React.FC = () => {
                   className="flex flex-col items-center p-3 rounded-lg bg-card hover:bg-muted transition-colors"
                 >
                   <span className="text-2xl mb-2">{category.icon}</span>
-                  <span className="text-xs text-center font-medium text-foreground">{category.name}</span>
+                  <span className="text-xs text-center font-medium text-foreground">
+                    {category.name}
+                  </span>
                 </Link>
               ))}
             </div>
@@ -144,16 +127,16 @@ const Home: React.FC = () => {
             <TrendingUp className="text-primary" size={20} />
             <h2 className="text-xl font-semibold text-foreground">Featured Items</h2>
           </div>
-
+          
           {featuredLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-72 rounded-xl" />
               ))}
             </div>
-          ) : featuredProducts.filter((p) => p.isFeatured).length > 0 ? (
+          ) : featuredProducts.filter(p => p.isFeatured).length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {featuredProducts.filter((p) => p.isFeatured).map((product) => (
+              {featuredProducts.filter(p => p.isFeatured).map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
@@ -168,7 +151,7 @@ const Home: React.FC = () => {
               <Button variant="ghost" size="sm">View All</Button>
             </Link>
           </div>
-
+          
           {recentLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Array.from({ length: 4 }).map((_, i) => (
