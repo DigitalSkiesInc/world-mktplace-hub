@@ -8,6 +8,7 @@ export interface ProductFilters {
   searchQuery?: string;
   condition?: string;
   sortBy?: 'price_asc' | 'price_desc' | 'rating_desc' | 'newest' | 'oldest';
+  country?: string | null;
 }
 
 export const useProducts = (filters: ProductFilters = {}) => {
@@ -173,6 +174,7 @@ function transformDbProductToProduct(dbProduct: any): Product {
     price: dbProduct.price,
     currency: dbProduct.currency,
     images: dbProduct.images,
+    externalLink: dbProduct.external_link,
     category: {
       id: dbProduct.category_id,
       name: dbProduct.category_name,
