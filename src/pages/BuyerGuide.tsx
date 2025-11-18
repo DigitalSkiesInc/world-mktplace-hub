@@ -166,7 +166,7 @@ const BuyerGuide: React.FC = () => {
               <div className="flex items-start gap-2">
                 <CheckCircle size={16} className="mt-0.5 flex-shrink-0" />
                 <p className="text-sm">
-                  <strong>Trust Your Instincts:</strong> Only proceed with payment if you trust 
+                  <strong>Pay Sellers You Trust Only:</strong> Only proceed with payment if you trust 
                   the seller and feel comfortable with the transaction.
                 </p>
               </div>
@@ -175,7 +175,7 @@ const BuyerGuide: React.FC = () => {
                 <MapPin size={16} className="mt-0.5 flex-shrink-0" />
                 <p className="text-sm">
                   <strong>Meet in Public Places:</strong> If meeting in person, always choose 
-                  a public, well-lit location such as a shopping mall, coffee shop, or police station parking lot.
+                  a public, well-lit location
                 </p>
               </div>
               
@@ -183,7 +183,7 @@ const BuyerGuide: React.FC = () => {
                 <Shield size={16} className="mt-0.5 flex-shrink-0" />
                 <p className="text-sm">
                   <strong>Verify Before Paying:</strong> When possible, inspect the product 
-                  before making payment. For shipped items, use secure payment methods with buyer protection.
+                  before making payment.
                 </p>
               </div>
               
@@ -199,7 +199,7 @@ const BuyerGuide: React.FC = () => {
         </Alert>
 
         {/* Additional Tips */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle className="text-lg">Additional Tips</CardTitle>
           </CardHeader>
@@ -229,7 +229,7 @@ const BuyerGuide: React.FC = () => {
               </p>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* CTA */}
         <div className="flex flex-col gap-3">

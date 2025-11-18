@@ -93,22 +93,7 @@ export default function CountryPhoneInput({
             return (
               <div>
                 <div >
-                  <ReactFlagsSelect
-                    countries={undefined} // all countries
-                    selected={selected}
-                    onSelect={(iso) => {
-                      const upper = (iso || '').toUpperCase();
-                      onCountryChange(upper)
-                    }}
-                    searchable={true}
-                    showSelectedLabel={true}
-                    showOptionsLabel={true}
-                    placeholder="Select country"
-                    selectedSize={16}
-                    optionsSize={14}
-                    searchablePlaceholder="Type to search..."
-                    className="react-flags-select--custom"
-                  />
+                  
                 </div>
               </div>
             );

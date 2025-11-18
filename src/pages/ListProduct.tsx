@@ -283,10 +283,21 @@ export default function ListProduct() {
                   name="external_link"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>External Link (Optional)</FormLabel>
+                      <FormLabel>External Link (Optional)
+
+                        <div>
+                        <p className="text-xs text-muted-foreground">
+                           External Link to your product e.g instagram, facebook, TikTok
+                          </p>
+                          </div>
+
+                      </FormLabel>
+
+                      
+                   
                       <FormControl>
                         <Input
-                          placeholder="https://instagram.com/yourstore..."
+                          placeholder="https://instagram.com/yourproduct..."
                           {...field}
                         />
                       </FormControl>
@@ -295,8 +306,7 @@ export default function ListProduct() {
                         <div className="flex items-start gap-2">
                           <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
                           <p className="text-xs text-amber-700 dark:text-amber-300">
-                            <strong>Warning:</strong> Suspicious or misleading links may result in your listing being banned. 
-                            Only add links to legitimate platforms where you also list this product.
+                            <strong>Warning:</strong> Suspicious or misleading links may result in your listing being removed from the platform
                           </p>
                         </div>
                       </div>

@@ -17,11 +17,7 @@ export const useProducts = (filters: ProductFilters = {}) => {
     queryFn: async () => {
 
       const MIN_PRODUCTS = 15;
-      
-      let baseQuery = supabase
-        .from('products_with_sellers')
-        .select('*')
-        .eq('status', 'active');
+    
 
         const buildBaseQuery = () => {
         let query = supabase
@@ -63,20 +59,24 @@ export const useProducts = (filters: ProductFilters = {}) => {
 
       
 
-      let country = await getDefaultCountry(false);
+      // let country = await getDefaultCountry(false);
+
+
+      console.log("Fetching products for country:", filters);
 
     
 
-      let { data:baseProducts, error } = country? await buildBaseQuery().eq('country', country).limit(MIN_PRODUCTS)
+      let { data:baseProducts, error } = filters.country? await buildBaseQuery().eq('country', filters.country).limit(MIN_PRODUCTS)
       : await buildBaseQuery().limit(MIN_PRODUCTS);
 
       if (error) throw error;
 
       delete filters.sortBy;
+      
 
       console.log("Base products fetched:", baseProducts.length);
 
-      if(country && (Object.keys(filters).length === 0 && baseProducts.length < MIN_PRODUCTS) 
+      if(filters.country && (Object.keys(filters).length === 0 && baseProducts.length < MIN_PRODUCTS) 
         || (Object.keys(filters).length !== 0 && baseProducts.length === 0)) {
 
           console.log("Fetching fallback products as country-specific results were insufficient.");
@@ -84,7 +84,7 @@ export const useProducts = (filters: ProductFilters = {}) => {
            const remaining = MIN_PRODUCTS - (baseProducts?.length || 0);
 
            const { data: fallbackProducts, error: fallbackError } = await buildBaseQuery()
-           .neq('country', country)
+           .neq('country', filters.country)
           .limit(remaining);
 
           // const { data: fallbackProducts, error: fallbackError } = await buildBaseQuery()

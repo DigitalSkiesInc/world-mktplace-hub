@@ -40,17 +40,17 @@ const Home: React.FC = () => {
     <div className="pb-20">
       {/* Hero Section */}
       <section className="relative bg-gradient-marketplace overflow-hidden">
-        <div className="relative px-4 py-8">
+        <div className="relative px-4 py-4">
           <div className="max-w-md mx-auto text-center">
             <h1 className="text-3xl font-bold text-foreground mb-2">
               World Marketplace
             </h1>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-muted-foreground mb-4">
               Buy and sell with verified World ID users
             </p>
             
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="relative mb-6 flex">
+            <form onSubmit={handleSearch} className="relative mb-4 flex">
               <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
               <Input
@@ -82,24 +82,14 @@ const Home: React.FC = () => {
           </div>
         </div>
 
-        {/* Hero Image */}
-        <div className="relative h-48 overflow-hidden">
-          <img
-            src={heroImage}
-            alt="World Marketplace"
-            className="w-full h-full object-cover opacity-20"
-          />
-        </div>
-      </section>
-
-      {/* Buyer's Guide Banner */}
-      <div className="px-4 py-3 bg-blue-50 dark:bg-blue-950/20 border-y border-blue-200 dark:border-blue-800">
+        {/* Buyer's Guide Banner */}
+      <div className="px-4 py-2 mb-2 bg-blue-50 dark:bg-blue-950/20 border-y border-blue-200 dark:border-blue-800">
         <div className="flex items-center justify-between max-w-2xl mx-auto">
           <div className="flex items-center gap-3">
             <Shield className="text-blue-600 dark:text-blue-400" size={20} />
             <div>
               <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                New to buying on World Marketplace?
+                New to Marketplace?
               </p>
               <p className="text-xs text-blue-700 dark:text-blue-300">
                 Learn how to shop safely and effectively
@@ -113,6 +103,18 @@ const Home: React.FC = () => {
           </Link>
         </div>
       </div>
+
+        {/* Hero Image */}
+        <div className="relative h-36 overflow-hidden">
+          <img
+            src={heroImage}
+            alt="World Marketplace"
+            className="w-full h-full object-cover opacity-20"
+          />
+        </div>
+      </section>
+
+      
 
       {/* Country Filter */}
       {!countryLoading && (
@@ -135,13 +137,13 @@ const Home: React.FC = () => {
           
           {categoriesLoading ? (
             <div className="grid grid-cols-4 gap-3">
-              {Array.from({ length: 8 }).map((_, i) => (
+              {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-20 rounded-lg" />
               ))}
             </div>
           ) : (
             <div className="grid grid-cols-4 gap-3">
-              {categories?.slice(0, 8).map((category) => (
+              {categories?.slice(0, 4).map((category) => (
                 <Link
                   key={category.id}
                   to={`/categories/${category.slug}`}

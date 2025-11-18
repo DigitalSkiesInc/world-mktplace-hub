@@ -221,7 +221,7 @@ const ProductDetail: React.FC = () => {
           {product.externalLink && (
             <div className="px-4 py-4 border-t border-border">
               <h3 className="text-sm font-semibold text-foreground mb-2">
-                Also Listed On
+                Other links to this product
               </h3>
               <a
                 href={product.externalLink}
@@ -230,11 +230,11 @@ const ProductDetail: React.FC = () => {
                 className="flex items-center gap-2 text-primary hover:underline text-sm"
               >
                 <ExternalLink size={16} />
-                View on external platform
+                {product.externalLink.length > 25 ? product.externalLink.slice(0, 25) + "…" : product.externalLink}
               </a>
-              <p className="text-xs text-muted-foreground mt-1">
+              {/* <p className="text-xs text-muted-foreground mt-1">
                 Check this seller's listing on other platforms
-              </p>
+              </p> */}
             </div>
           )}
 
