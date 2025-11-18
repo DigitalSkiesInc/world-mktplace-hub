@@ -12,6 +12,7 @@ interface UpdateProductData {
   category_id?: string;
   condition?: 'new' | 'second-hand';
   status?: 'active' | 'inactive' | 'paused' | 'sold';
+  external_link?: string | null;
 }
 
 export const useUpdateProduct = () => {

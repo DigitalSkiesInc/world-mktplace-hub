@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, Upload, X } from 'lucide-react';
+import { ArrowLeft, Upload, X, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,7 +22,8 @@ const productSchema = z.object({
   price: z.number().min(0.01, 'Price must be greater than 0'),
   currency: z.enum(['WLD', 'USD']),
   category_id: z.string().min(1, 'Please select a category'),
-  condition: z.enum(['new', 'second-hand'])
+  condition: z.enum(['new', 'second-hand']),
+  external_link: z.string().url('Must be a valid URL').optional().or(z.literal(''))
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -46,7 +47,8 @@ export default function ListProduct() {
       price: 0,
       currency: 'WLD',
       category_id: '',
-      condition: 'new'
+      condition: 'new',
+      external_link: ''
     },
   });
 
@@ -123,6 +125,7 @@ export default function ListProduct() {
         condition: data.condition,
         images: imageUrls,
         seller_id: sellerId,
+        external_link: data.external_link || null,
       });
 
       // Navigate to preview page
@@ -271,6 +274,42 @@ export default function ListProduct() {
                         </SelectContent>
                       </Select>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="external_link"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>External Link (Optional)
+
+                        <div>
+                        <p className="text-xs text-muted-foreground">
+                           External Link to your product e.g instagram, facebook, TikTok
+                          </p>
+                          </div>
+
+                      </FormLabel>
+
+                      
+                   
+                      <FormControl>
+                        <Input
+                          placeholder="https://instagram.com/yourproduct..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 mt-2">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                          <p className="text-xs text-amber-700 dark:text-amber-300">
+                            <strong>Warning:</strong> Suspicious or misleading links may result in your listing being removed from the platform
+                          </p>
+                        </div>
+                      </div>
                     </FormItem>
                   )}
                 />

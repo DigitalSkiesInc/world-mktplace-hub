@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Plus, TrendingUp, Eye } from 'lucide-react';
+import { Search, Plus, TrendingUp, Eye, Shield } from 'lucide-react';
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,19 +9,24 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useWorldApp } from '@/contexts/WorldAppContext';
+import { CountryFilter } from '@/components/CountryFilter';
+import { useCountryFilter } from '@/hooks/useCountryFilter';
 import heroImage from '@/assets/marketplace-hero.jpg';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useWorldApp();
   const [searchQuery, setSearchQuery] = React.useState('');
+  const { selectedCountry, detectedCountry, isLoading: countryLoading, handleCountryChange } = useCountryFilter();
   
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   const { data: featuredProducts = [], isLoading: featuredLoading } = useProducts({ 
-    sortBy: 'newest' 
+    sortBy: 'newest',
+    country: selectedCountry 
   });
   const { data: recentProducts = [], isLoading: recentLoading } = useProducts({ 
-    sortBy: 'newest' 
+    sortBy: 'newest',
+    country: selectedCountry 
   });
 
   const handleSearch = (e: React.FormEvent) => {
@@ -35,17 +40,17 @@ const Home: React.FC = () => {
     <div className="pb-20">
       {/* Hero Section */}
       <section className="relative bg-gradient-marketplace overflow-hidden">
-        <div className="relative px-4 py-8">
+        <div className="relative px-4 py-4">
           <div className="max-w-md mx-auto text-center">
             <h1 className="text-3xl font-bold text-foreground mb-2">
               World Marketplace
             </h1>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-muted-foreground mb-4">
               Buy and sell with verified World ID users
             </p>
             
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="relative mb-6 flex">
+            <form onSubmit={handleSearch} className="relative mb-4 flex">
               <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
               <Input
@@ -77,8 +82,30 @@ const Home: React.FC = () => {
           </div>
         </div>
 
+        {/* Buyer's Guide Banner */}
+      <div className="px-4 py-2 mb-2 bg-blue-50 dark:bg-blue-950/20 border-y border-blue-200 dark:border-blue-800">
+        <div className="flex items-center justify-between max-w-2xl mx-auto">
+          <div className="flex items-center gap-3">
+            <Shield className="text-blue-600 dark:text-blue-400" size={20} />
+            <div>
+              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                New to Marketplace?
+              </p>
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                Learn how to shop safely and effectively
+              </p>
+            </div>
+          </div>
+          <Link to="/buyer-guide">
+            <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
+              Learn More
+            </Button>
+          </Link>
+        </div>
+      </div>
+
         {/* Hero Image */}
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-36 overflow-hidden">
           <img
             src={heroImage}
             alt="World Marketplace"
@@ -86,6 +113,17 @@ const Home: React.FC = () => {
           />
         </div>
       </section>
+
+      
+
+      {/* Country Filter */}
+      {!countryLoading && (
+        <CountryFilter
+          selectedCountry={selectedCountry}
+          detectedCountry={detectedCountry}
+          onCountryChange={handleCountryChange}
+        />
+      )}
 
       <div className="px-4 py-6 space-y-8">
         {/* Categories Grid */}
@@ -99,13 +137,13 @@ const Home: React.FC = () => {
           
           {categoriesLoading ? (
             <div className="grid grid-cols-4 gap-3">
-              {Array.from({ length: 8 }).map((_, i) => (
+              {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-20 rounded-lg" />
               ))}
             </div>
           ) : (
             <div className="grid grid-cols-4 gap-3">
-              {categories?.slice(0, 8).map((category) => (
+              {categories?.slice(0, 4).map((category) => (
                 <Link
                   key={category.id}
                   to={`/categories/${category.slug}`}

@@ -11,6 +11,7 @@ interface CreateProductData {
   category_id: string;
   condition: 'new' | 'second-hand';
   seller_id: string;
+  external_link?: string | null;
 }
 
 export const useCreateProduct = () => {

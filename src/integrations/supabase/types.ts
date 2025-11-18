@@ -50,13 +50,6 @@ export type Database = {
             referencedRelation: "categories"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "categories_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "products_with_sellers"
-            referencedColumns: ["category_id"]
-          },
         ]
       }
       conversations: {
@@ -224,6 +217,27 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_seller"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_sellers"
+            referencedColumns: ["seller_id"]
+          },
+          {
+            foreignKeyName: "fk_seller"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_seller"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "listing_payments_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: true
@@ -365,6 +379,7 @@ export type Database = {
           created_at: string
           currency: string
           description: string
+          external_link: string | null
           id: string
           images: string[]
           is_featured: boolean
@@ -384,6 +399,7 @@ export type Database = {
           created_at?: string
           currency?: string
           description: string
+          external_link?: string | null
           id?: string
           images?: string[]
           is_featured?: boolean
@@ -403,6 +419,7 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string
+          external_link?: string | null
           id?: string
           images?: string[]
           is_featured?: boolean
@@ -423,13 +440,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "products_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "products_with_sellers"
-            referencedColumns: ["category_id"]
           },
           {
             foreignKeyName: "products_user_profiles_id_fkey"
@@ -549,6 +559,7 @@ export type Database = {
           created_at: string | null
           currency: string | null
           description: string | null
+          external_link: string | null
           id: string | null
           images: string[] | null
           is_featured: boolean | null
@@ -572,11 +583,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "categories_parent_id_fkey"
-            columns: ["category_parent_id"]
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
             isOneToOne: false
-            referencedRelation: "products_with_sellers"
-            referencedColumns: ["category_id"]
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
           },
         ]
       }

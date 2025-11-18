@@ -8,19 +8,16 @@ export interface ProductFilters {
   searchQuery?: string;
   condition?: string;
   sortBy?: 'price_asc' | 'price_desc' | 'rating_desc' | 'newest' | 'oldest';
+  country?: string | null;
 }
 
-export const useProducts = (filters: ProductFilters = {}) => {
+export const useProducts = (filters: ProductFilters = {}, strictSearch: boolean = false) => {
   return useQuery({
     queryKey: ['products', filters],
     queryFn: async () => {
 
       const MIN_PRODUCTS = 15;
-      
-      let baseQuery = supabase
-        .from('products_with_sellers')
-        .select('*')
-        .eq('status', 'active');
+    
 
         const buildBaseQuery = () => {
         let query = supabase
@@ -62,28 +59,32 @@ export const useProducts = (filters: ProductFilters = {}) => {
 
       
 
-      let country = await getDefaultCountry(false);
+      // let country = await getDefaultCountry(false);
+
+
+      console.log("Fetching products for country:", filters);
 
     
 
-      let { data:baseProducts, error } = country? await buildBaseQuery().eq('country', country).limit(MIN_PRODUCTS)
+      let { data:baseProducts, error } = filters.country? await buildBaseQuery().eq('country', filters.country).limit(MIN_PRODUCTS)
       : await buildBaseQuery().limit(MIN_PRODUCTS);
 
       if (error) throw error;
 
       delete filters.sortBy;
+      
 
       console.log("Base products fetched:", baseProducts.length);
 
-      if(country && (Object.keys(filters).length === 0 && baseProducts.length < MIN_PRODUCTS) 
-        || (Object.keys(filters).length !== 0 && baseProducts.length === 0)) {
+      if(!strictSearch && (filters.country && (Object.keys(filters).length === 0 && baseProducts.length < MIN_PRODUCTS) 
+        || (Object.keys(filters).length !== 0 && baseProducts.length === 0))) {
 
           console.log("Fetching fallback products as country-specific results were insufficient.");
 
            const remaining = MIN_PRODUCTS - (baseProducts?.length || 0);
 
            const { data: fallbackProducts, error: fallbackError } = await buildBaseQuery()
-           .neq('country', country)
+           .neq('country', filters.country)
           .limit(remaining);
 
           // const { data: fallbackProducts, error: fallbackError } = await buildBaseQuery()
@@ -173,6 +174,7 @@ function transformDbProductToProduct(dbProduct: any): Product {
     price: dbProduct.price,
     currency: dbProduct.currency,
     images: dbProduct.images,
+    externalLink: dbProduct.external_link,
     category: {
       id: dbProduct.category_id,
       name: dbProduct.category_name,

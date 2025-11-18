@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share, MapPin, Star, Shield, MessageCircle, Phone } from 'lucide-react';
+import { ArrowLeft, Heart, Share, MapPin, Star, Shield, MessageCircle, Phone, ExternalLink } from 'lucide-react';
 import { useProduct } from '@/hooks/useProducts';
 import { useCreateConversation } from '@/hooks/useCreateConversation';
 import { useWorldApp } from '@/contexts/WorldAppContext';
@@ -216,6 +216,27 @@ const ProductDetail: React.FC = () => {
             <h3 className="font-semibold text-foreground mb-2">Description</h3>
             <p className="text-muted-foreground leading-relaxed">{product.description}</p>
           </div>
+
+          {/* External Link */}
+          {product.externalLink && (
+            <div className="px-4 py-4 border-t border-border">
+              <h3 className="text-sm font-semibold text-foreground mb-2">
+                Other links to this product
+              </h3>
+              <a
+                href={product.externalLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-primary hover:underline text-sm"
+              >
+                <ExternalLink size={16} />
+                {product.externalLink.length > 25 ? product.externalLink.slice(0, 25) + "…" : product.externalLink}
+              </a>
+              {/* <p className="text-xs text-muted-foreground mt-1">
+                Check this seller's listing on other platforms
+              </p> */}
+            </div>
+          )}
 
           {/* Seller Info */}
           <div className="bg-card rounded-xl p-4 border border-border">
