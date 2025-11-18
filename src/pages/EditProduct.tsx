@@ -87,7 +87,7 @@ export default function EditProduct() {
         currency: productData.currency as 'WLD' | 'USD',
         category_id: productData.category_id,
         condition: productData.condition as 'new' | 'second-hand',
-        external_link: productData.external_link || '',
+        external_link: (productData as any).external_link ?? '',
       });
     } catch (error: any) {
       toast({
