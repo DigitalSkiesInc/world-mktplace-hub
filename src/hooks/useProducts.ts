@@ -11,7 +11,7 @@ export interface ProductFilters {
   country?: string | null;
 }
 
-export const useProducts = (filters: ProductFilters = {}) => {
+export const useProducts = (filters: ProductFilters = {}, strictSearch: boolean = false) => {
   return useQuery({
     queryKey: ['products', filters],
     queryFn: async () => {
@@ -76,8 +76,8 @@ export const useProducts = (filters: ProductFilters = {}) => {
 
       console.log("Base products fetched:", baseProducts.length);
 
-      if(filters.country && (Object.keys(filters).length === 0 && baseProducts.length < MIN_PRODUCTS) 
-        || (Object.keys(filters).length !== 0 && baseProducts.length === 0)) {
+      if(!strictSearch && (filters.country && (Object.keys(filters).length === 0 && baseProducts.length < MIN_PRODUCTS) 
+        || (Object.keys(filters).length !== 0 && baseProducts.length === 0))) {
 
           console.log("Fetching fallback products as country-specific results were insufficient.");
 

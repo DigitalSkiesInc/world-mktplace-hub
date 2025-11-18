@@ -37,7 +37,7 @@ const Categories: React.FC = () => {
     country: selectedCountry,
   };
   
-  const { data: products = [], isLoading: productsLoading } = useProducts(filters);
+  const { data: products = [], isLoading: productsLoading } = useProducts(filters,true);
 
   const conditions = ['all', 'new', 'second-hand'];
   const sortOptions = [

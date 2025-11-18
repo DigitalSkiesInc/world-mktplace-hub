@@ -4,8 +4,8 @@ import type { Database } from './types';
 
 
 export const supabase = createClient<Database>(
-  "https://iaigqtogtnajyopvwjij.supabase.co", 
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhaWdxdG9ndG5hanlvcHZ3amlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4NzYzODksImV4cCI6MjA3NDQ1MjM4OX0.XSD9_09RxOXz5n3LE9cWPzI3TbdSsNHmPVmi0e9l2-E", {
+  import.meta.env.VITE_PUBLIC_SUPABASE_URL, 
+  import.meta.env.VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: localStorage,
     persistSession: true,
