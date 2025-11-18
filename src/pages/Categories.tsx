@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useProducts, useCategories, ProductFilters } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
+import { CountryFilter } from '@/components/CountryFilter';
+import { useCountryFilter } from '@/hooks/useCountryFilter';
 
 const Categories: React.FC = () => {
   const { slug } = useParams();
@@ -20,6 +22,7 @@ const Categories: React.FC = () => {
   const [selectedCondition, setSelectedCondition] = React.useState<string>('all');
   const [sortBy, setSortBy] = React.useState<string>('newest');
   const navigate = useNavigate();
+  const { selectedCountry, detectedCountry, isLoading: countryLoading, handleCountryChange } = useCountryFilter();
 
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   
@@ -31,6 +34,7 @@ const Categories: React.FC = () => {
     searchQuery: searchQuery || undefined,
     condition: selectedCondition !== 'all' ? selectedCondition : undefined,
     sortBy: sortBy as ProductFilters['sortBy'],
+    country: selectedCountry,
   };
   
   const { data: products = [], isLoading: productsLoading } = useProducts(filters);
@@ -130,6 +134,15 @@ const Categories: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Country Filter */}
+      {!countryLoading && (
+        <CountryFilter
+          selectedCountry={selectedCountry}
+          detectedCountry={detectedCountry}
+          onCountryChange={handleCountryChange}
+        />
+      )}
 
       <div className="px-4 py-6">
         {/* Categories Grid (when no specific category selected) */}
