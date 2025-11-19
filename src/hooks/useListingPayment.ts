@@ -34,12 +34,12 @@ export const useListingPayment = () => {
     }
 
 
-   const verifyPayment = async (transactionDetails) => {
+   const verifyPayment = async (transactionDetails:{transaction_id:string;reference:string}) => {
     const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/v1/verify-payment', {
       method: 'POST',
       credentials: "include",
       headers: { 'Content-Type': 'application/json' },
-      body: transactionDetails,
+      body: JSON.stringify(transactionDetails),
         }
       );
     const data = await res.json();

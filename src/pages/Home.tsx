@@ -147,9 +147,9 @@ const Home: React.FC = () => {
                 <Link
                   key={category.id}
                   to={`/categories/${category.slug}`}
-                  className="flex flex-col items-center p-3 rounded-lg bg-card hover:bg-muted transition-colors"
+                  className="flex flex-col items-center p-2 rounded-lg bg-card hover:bg-muted transition-colors"
                 >
-                  <span className="text-2xl mb-2">{category.icon}</span>
+                  <span className="text-2xl mb-1">{category.icon}</span>
                   <span className="text-xs text-center font-medium text-foreground">
                     {category.name}
                   </span>
