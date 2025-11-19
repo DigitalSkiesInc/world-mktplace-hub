@@ -59,18 +59,18 @@ export default function ListingPayment() {
 
   // Initialize selected currency based on available currencies
   useEffect(() => {
-    if(listingFeeConfig){
-      if('USDC' in listingFeeConfig && listingFeeConfig['USDC'].available === true ){
-      setSelectedCurrency('USDC');;
-    }
-    else{
-      const firstAvailable = Object.entries(listingFeeConfig).find(([_, value])=> value.available === true);
-      if(firstAvailable){
-        setSelectedCurrency(firstAvailable[0]);
+    if (listingFeeConfig) {
+      if ('USDC' in listingFeeConfig && listingFeeConfig['USDC'].available === true) {
+        setSelectedCurrency('USDC');;
+      }
+      else {
+        const firstAvailable = Object.entries(listingFeeConfig).find(([_, value]) => value.available === true);
+        if (firstAvailable) {
+          setSelectedCurrency(firstAvailable[0]);
+        }
       }
     }
-    }
-    
+
   }, [listingFeeConfig]);
 
   const handlePayment = async () => {
@@ -95,7 +95,7 @@ export default function ListingPayment() {
         tokens: [
           {
             symbol: Tokens[paymentData.currency as keyof typeof Tokens],
-            token_amount: tokenToDecimals(paymentData.amount,Tokens[paymentData.currency as keyof typeof Tokens]).toString(),
+            token_amount: tokenToDecimals(paymentData.amount, Tokens[paymentData.currency as keyof typeof Tokens]).toString(),
           },
         ],
         description: 'Listing Fee Payment',
@@ -107,20 +107,17 @@ export default function ListingPayment() {
       }
 
 
-      // const { finalPayload } = await MiniKit.commandsAsync.pay(payload)
+      const { finalPayload } = await MiniKit.commandsAsync.pay(payload)
 
 
       // for testing, payload not set as constant
-      let { finalPayload } = await MiniKit.commandsAsync.pay(payload)
+      // let { finalPayload } = await MiniKit.commandsAsync.pay(payload)
 
- 
+
 
       // await new Promise(resolve => setTimeout(resolve, 2000));
       // const finalPayload = { status: "success", reference: paymentData.paymentId, error_code: null }; // replace with actual payment result
 
-      console.log("Final Payload:", finalPayload);
-
-     
 
       if (finalPayload.status !== "success") {
         throw new Error(`Payment failed. ${finalPayload.error_code || 'Please try again.'}`);
@@ -140,7 +137,12 @@ export default function ListingPayment() {
       }
 
       // Verify payment
-      const verifyData = await verifyPayment(JSON.stringify(finalPayload));
+      const verifyData = await verifyPayment(
+        {
+          transaction_id: finalPayload.transaction_id,
+          reference: finalPayload.reference
+        }
+      );
 
       console.log("Verify Data:", verifyData);
 
@@ -229,24 +231,24 @@ export default function ListingPayment() {
                 <Separator />
 
                 {/* Currency Selector - Only show if multiple currencies available */}
-                {listingFeeConfig 
-                && Object.entries(listingFeeConfig).filter(([_, value]: any) => value.available).length>1 
-                && (
-                  <div className="space-y-3">
-                    <Label>Payment Currency</Label>
-                     <RadioGroup value={selectedCurrency} onValueChange={setSelectedCurrency}>
-                    {Object.entries(listingFeeConfig || {})
-                    .map(([symbol, info]) => (
-                          <div key={symbol} className="flex items-center space-x-2">
-                            <RadioGroupItem value={symbol} id={symbol} />
-                            <Label htmlFor={symbol} className="cursor-pointer font-normal">
-                              {info.label} - {info.amount} {info.symbol}
-                            </Label>
-                          </div>
-                        ))}
-                    </RadioGroup>
-                  </div>
-                )}
+                {listingFeeConfig
+                  && Object.entries(listingFeeConfig).filter(([_, value]: any) => value.available).length > 1
+                  && (
+                    <div className="space-y-3">
+                      <Label>Payment Currency</Label>
+                      <RadioGroup value={selectedCurrency} onValueChange={setSelectedCurrency}>
+                        {Object.entries(listingFeeConfig || {})
+                          .map(([symbol, info]) => (
+                            <div key={symbol} className="flex items-center space-x-2">
+                              <RadioGroupItem value={symbol} id={symbol} />
+                              <Label htmlFor={symbol} className="cursor-pointer font-normal">
+                                {info.label} - {info.amount} {info.symbol}
+                              </Label>
+                            </div>
+                          ))}
+                      </RadioGroup>
+                    </div>
+                  )}
 
                 <Separator />
 
