@@ -83,6 +83,28 @@ const Home: React.FC = () => {
           </div>
         </div>
 
+        {/* Buyer's Guide Banner */}
+      <div className="px-4 py-2 mb-2 bg-blue-50 dark:bg-blue-950/20 border-y border-blue-200 dark:border-blue-800">
+        <div className="flex items-center justify-between max-w-2xl mx-auto">
+          <div className="flex items-center gap-3">
+            <Shield className="text-blue-600 dark:text-blue-400" size={20} />
+            <div>
+              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                New to Marketplace?
+              </p>
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                Learn how to shop safely and effectively
+              </p>
+            </div>
+          </div>
+          <Link to="/buyer-guide">
+            <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
+              Learn More
+            </Button>
+          </Link>
+        </div>
+      </div>
+
         {/* Hero Image */}
         <div className="relative h-36 overflow-hidden">
           <img
