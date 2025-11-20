@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Plus, TrendingUp, Eye, Shield } from 'lucide-react';
+import { Search, ShoppingBag,Plus, TrendingUp, Eye, Shield } from 'lucide-react';
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -73,9 +73,10 @@ const Home: React.FC = () => {
                   Sell Item
                 </Button>
               </Link>
-              <Link to="/categories">
-                <Button variant="outline">
-                  Browse Categories
+              <Link to="/buyer-guide">
+                <Button variant="outline" className="border-primary text-primary hover:text-primary hover:border-primary">
+                <ShoppingBag size={16} className="mr-2 font-semibold" />
+                  Buy Item
                 </Button>
               </Link>
             </div>
