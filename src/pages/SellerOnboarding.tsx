@@ -265,7 +265,7 @@ export default function SellerOnboarding() {
                             // when country changes, clear state field
                             form.setValue('country', iso);
                           }}
-                          defaultCountryISO={undefined}
+                          defaultCountryISO={"undefined"}
                         />
                       </FormControl>
                       <FormMessage />
