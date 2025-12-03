@@ -7,7 +7,7 @@ import { WorldAppProvider } from "@/contexts/WorldAppContext";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { Outlet, Navigate } from "react-router-dom";
 import { useWorldApp } from '@/contexts/WorldAppContext';
-import { Loader2 } from 'lucide-react';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import Home from "./pages/Home";
 import Categories from "./pages/Categories";
 import Chat from "./pages/Chat";
@@ -39,11 +39,7 @@ const queryClient = new QueryClient();
 function ProtectedLayout() {
   const { user, isLoading } = useWorldApp();
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
   return user ? 
   <div>
@@ -58,11 +54,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   const { data: userRole, isLoading: roleLoading } = useUserRole();
   
   if (isLoading || roleLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingScreen message="Verifying access..." />;
   }
   
   if (!user) return <Navigate to="/login" replace />;
