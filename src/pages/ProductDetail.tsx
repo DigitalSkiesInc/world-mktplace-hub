@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { ContactSellerDialog } from '@/components/ContactSellerDialog';
 import { toast } from '@/hooks/use-toast';
-import { SafetyNotice } from '@/components/SafetyNotice';
+
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -319,11 +319,6 @@ const ProductDetail: React.FC = () => {
               )}
             </div>
           </div>
-
-        {/* Safety Notice below buttons */}
-        <div className="px-4 pb-3 pt-0">
-          <SafetyNotice />
-        </div>
       </div>
 
       {/* Contact Seller Phone Dialog */}

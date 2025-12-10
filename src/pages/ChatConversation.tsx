@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Send, Shield } from 'lucide-react';
+import { ArrowLeft, Send, Shield, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useConversation } from '@/hooks/useConversation';
@@ -132,6 +132,19 @@ const ChatConversation: React.FC = () => {
             </p>
           </div>
         </Link>
+
+        {/* Safety Precaution Banner */}
+        <div className="mx-4 mt-3 px-3 py-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={14} className="text-amber-600 dark:text-amber-400 flex-shrink-0" />
+            <p className="text-xs text-amber-800 dark:text-amber-200">
+              Be cautious when making purchases.{' '}
+              <Link to="/safety-guidelines" className="underline font-medium hover:text-amber-900 dark:hover:text-amber-100">
+                Learn more
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Messages */}

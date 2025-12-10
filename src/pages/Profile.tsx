@@ -256,35 +256,42 @@ const Profile: React.FC = () => {
         </Card>
 
         {/* Support Section */}
-        {(supportContact?.email || supportContact?.phone) && (
-          <Card className="p-4 mb-6">
-            <h3 className="font-semibold text-foreground mb-4">Support</h3>
-            <div className="space-y-2">
-              {supportContact.email && (
-                <a href={`mailto:${supportContact.email}`} className="block">
-                  <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
-                    <Mail size={20} className="text-muted-foreground" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-foreground">Email Support</p>
-                      <p className="text-xs text-muted-foreground">{supportContact.email}</p>
-                    </div>
+        <Card className="p-4 mb-6">
+          <h3 className="font-semibold text-foreground mb-4">Support</h3>
+          <div className="space-y-2">
+            <Link to="/safety-guidelines" className="block">
+              <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
+                <Shield size={20} className="text-muted-foreground" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">Safety Guidelines</p>
+                  <p className="text-xs text-muted-foreground">Learn how to stay safe on the platform</p>
+                </div>
+              </div>
+            </Link>
+            {supportContact?.email && (
+              <a href={`mailto:${supportContact.email}`} className="block">
+                <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
+                  <Mail size={20} className="text-muted-foreground" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">Email Support</p>
+                    <p className="text-xs text-muted-foreground">{supportContact.email}</p>
                   </div>
-                </a>
-              )}
-              {supportContact.phone && (
-                <a href={`tel:${supportContact.phone}`} className="block">
-                  <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
-                    <Phone size={20} className="text-muted-foreground" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-foreground">Phone Support</p>
-                      <p className="text-xs text-muted-foreground">{supportContact.phone}</p>
-                    </div>
+                </div>
+              </a>
+            )}
+            {supportContact?.phone && (
+              <a href={`tel:${supportContact.phone}`} className="block">
+                <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
+                  <Phone size={20} className="text-muted-foreground" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">Phone Support</p>
+                    <p className="text-xs text-muted-foreground">{supportContact.phone}</p>
                   </div>
-                </a>
-              )}
-            </div>
-          </Card>
-        )}
+                </div>
+              </a>
+            )}
+          </div>
+        </Card>
 
         {/* Disconnect */}
         <Button
