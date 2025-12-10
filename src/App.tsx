@@ -25,6 +25,7 @@ import EditProfile from "./pages/EditProfile";
 import EditProduct from "./pages/EditProduct";
 import Favorites from "./pages/Favorites";
 import BuyerGuide from "./pages/BuyerGuide";
+import SafetyGuidelines from "./pages/SafetyGuidelines";
 import MiniKitProvider from "./providers//minikit-provider";
 import Admin from "./pages/Admin";
 import AdminConfig from "./pages/admin/AdminConfig";
@@ -97,6 +98,7 @@ const App = () => (
               <Route path="/edit-product/:id" element={<EditProduct />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/buyer-guide" element={<BuyerGuide />} />
+              <Route path="/safety-guidelines" element={<SafetyGuidelines />} />
               <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
               <Route path="/admin/config" element={<AdminRoute><AdminConfig /></AdminRoute>} />
               <Route path="/admin/payments" element={<AdminRoute><AdminPayments /></AdminRoute>} />
