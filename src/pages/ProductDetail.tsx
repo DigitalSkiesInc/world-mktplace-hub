@@ -2,7 +2,6 @@ import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, Share, MapPin, Star, Shield, MessageCircle, Phone, ExternalLink } from 'lucide-react';
 import { useProduct } from '@/hooks/useProducts';
-import { useCreateConversation } from '@/hooks/useCreateConversation';
 import { useWorldApp } from '@/contexts/WorldAppContext';
 import { useIsFavorited } from '@/hooks/useIsFavorited';
 import { useToggleFavorite } from '@/hooks/useToggleFavorite';
@@ -13,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { ContactSellerDialog } from '@/components/ContactSellerDialog';
 import { toast } from '@/hooks/use-toast';
-
+import { supabase } from '@/integrations/supabase/client';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,8 +21,8 @@ const ProductDetail: React.FC = () => {
   const { data: product, isLoading, error } = useProduct(id!);
   const { data: isFavorited = false } = useIsFavorited(id!);
   const toggleFavorite = useToggleFavorite();
-  const createConversation = useCreateConversation();
   const [showPhoneDialog, setShowPhoneDialog] = React.useState(false);
+  const [isNavigating, setIsNavigating] = React.useState(false);
 
   const handleFavoriteClick = () => {
     if (!user) {
@@ -58,15 +57,34 @@ const ProductDetail: React.FC = () => {
       return;
     }
 
-    try {
-      const conversation = await createConversation.mutateAsync({
-        productId: product.id,
-        sellerId: product.seller.id,
-      });
+    setIsNavigating(true);
 
-      navigate(`/chat/${conversation.id}`);
+    try {
+      // Check if a conversation already exists
+      const { data: existingConversation } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('product_id', product.id)
+        .eq('buyer_id', user.id)
+        .eq('seller_id', product.seller.id)
+        .maybeSingle();
+
+      if (existingConversation) {
+        // Navigate to existing conversation
+        navigate(`/chat/${existingConversation.id}`);
+      } else {
+        // Navigate to new chat page - conversation will be created on first message
+        navigate(`/chat/new?productId=${product.id}&sellerId=${product.seller.id}`);
+      }
     } catch (error) {
-      console.error('Error creating conversation:', error);
+      console.error('Error checking conversation:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to start conversation. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsNavigating(false);
     }
   };
 
@@ -232,9 +250,6 @@ const ProductDetail: React.FC = () => {
                 <ExternalLink size={16} />
                 {product.externalLink.length > 25 ? product.externalLink.slice(0, 25) + "…" : product.externalLink}
               </a>
-              {/* <p className="text-xs text-muted-foreground mt-1">
-                Check this seller's listing on other platforms
-              </p> */}
             </div>
           )}
 
@@ -303,7 +318,7 @@ const ProductDetail: React.FC = () => {
                 variant="outline"
                 className="flex-1"
                 onClick={handleContactSeller}
-                disabled={createConversation.isPending}
+                disabled={isNavigating}
               >
                 <MessageCircle size={18} className="mr-2" />
                 {product.seller.phone ? 'Message' : 'Message Seller'}

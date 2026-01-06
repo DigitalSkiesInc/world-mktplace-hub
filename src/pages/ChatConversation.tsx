@@ -1,21 +1,47 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Send, Shield, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useConversation } from '@/hooks/useConversation';
+import { useProductForChat } from '@/hooks/useProductForChat';
+import { useCreateConversation } from '@/hooks/useCreateConversation';
 import { useSendMessage } from '@/hooks/useSendMessage';
 import { useWorldApp } from '@/contexts/WorldAppContext';
 
 const ChatConversation: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useWorldApp();
   const [message, setMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { data: conversation, isLoading } = useConversation(id!);
+  const isNewConversation = id === 'new';
+  const productId = searchParams.get('productId');
+  const sellerId = searchParams.get('sellerId');
+
+  // Track the created conversation ID for new conversations
+  const [createdConversationId, setCreatedConversationId] = useState<string | null>(null);
+
+  // For existing conversations
+  const { data: conversation, isLoading: convLoading } = useConversation(
+    isNewConversation ? '' : id!
+  );
+
+  // For new conversations - fetch product/seller directly
+  const { data: newChatData, isLoading: newChatLoading } = useProductForChat(
+    isNewConversation ? productId : null,
+    isNewConversation ? sellerId : null
+  );
+
+  const createConversation = useCreateConversation();
   const sendMessageMutation = useSendMessage();
+
+  // Determine which data to use
+  const displayData = isNewConversation ? newChatData : conversation;
+  const messages = isNewConversation ? [] : (conversation?.messages || []);
+  const isLoading = isNewConversation ? newChatLoading : convLoading;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -23,13 +49,36 @@ const ChatConversation: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [conversation?.messages]);
+  }, [messages]);
 
   const handleSend = async () => {
-    if (!message.trim() || !id) return;
+    if (!message.trim()) return;
 
+    let targetConversationId = createdConversationId || id;
+
+    // If new conversation, create it first
+    if (isNewConversation && !createdConversationId) {
+      if (!productId || !sellerId) return;
+
+      const newConv = await createConversation.mutateAsync({
+        productId: productId,
+        sellerId: sellerId,
+      });
+
+      if (!newConv) return;
+
+      targetConversationId = newConv.id;
+      setCreatedConversationId(newConv.id);
+
+      // Update URL without adding to history
+      navigate(`/chat/${newConv.id}`, { replace: true });
+    }
+
+    if (!targetConversationId || targetConversationId === 'new') return;
+
+    // Send the message
     await sendMessageMutation.mutateAsync({
-      conversationId: id,
+      conversationId: targetConversationId,
       content: message.trim(),
     });
 
@@ -63,8 +112,7 @@ const ChatConversation: React.FC = () => {
     );
   }
 
-
-  if (!conversation) {
+  if (!displayData) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
         <p className="text-muted-foreground mb-4">Conversation not found</p>
@@ -88,25 +136,25 @@ const ChatConversation: React.FC = () => {
               <ArrowLeft size={20} />
             </Button>
 
-            <Link to={`/product/${conversation.product.id}`} className="flex items-center gap-3 flex-1 min-w-0">
+            <Link to={`/product/${displayData.product.id}`} className="flex items-center gap-3 flex-1 min-w-0">
               <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                 <img
-                  src={conversation.product.images[0]}
-                  alt={conversation.product.title}
+                  src={displayData.product.images[0]}
+                  alt={displayData.product.title}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-foreground truncate">
-                    {conversation.participant.username}
+                    {displayData.participant.username}
                   </span>
-                  {conversation.participant.isVerified && (
+                  {displayData.participant.isVerified && (
                     <Shield size={14} className="text-primary flex-shrink-0" />
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground truncate">
-                  {conversation.product.title}
+                  {displayData.product.title}
                 </p>
               </div>
             </Link>
@@ -115,20 +163,20 @@ const ChatConversation: React.FC = () => {
 
         {/* Product Info Banner */}
         <Link
-          to={`/product/${conversation.product.id}`}
+          to={`/product/${displayData.product.id}`}
           className="flex items-center gap-3 px-4 py-2 bg-muted/50 hover:bg-muted transition-colors"
         >
           <div className="w-12 h-12 rounded-lg overflow-hidden bg-background">
             <img
-              src={conversation.product.images[0]}
-              alt={conversation.product.title}
+              src={displayData.product.images[0]}
+              alt={displayData.product.title}
               className="w-full h-full object-cover"
             />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm truncate">{conversation.product.title}</p>
+            <p className="font-medium text-sm truncate">{displayData.product.title}</p>
             <p className="text-sm text-primary font-semibold">
-              {conversation.product.price} {conversation.product.currency}
+              {displayData.product.price} {displayData.product.currency}
             </p>
           </div>
         </Link>
@@ -149,9 +197,9 @@ const ChatConversation: React.FC = () => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-        {conversation.messages.length === 0 ? (
+        {messages.length === 0 ? (
           <p className="text-muted-foreground text-center">No messages yet. Start the conversation!</p>
-        ) : (conversation.messages.map((msg) => {
+        ) : (messages.map((msg) => {
           const isOwnMessage = msg.senderId === user.id;
           return (
             <div
@@ -191,11 +239,11 @@ const ChatConversation: React.FC = () => {
             onKeyPress={handleKeyPress}
             placeholder="Type a message..."
             className="flex-1"
-            disabled={sendMessageMutation.isPending}
+            disabled={sendMessageMutation.isPending || createConversation.isPending}
           />
           <Button
             onClick={handleSend}
-            disabled={!message.trim() || sendMessageMutation.isPending}
+            disabled={!message.trim() || sendMessageMutation.isPending || createConversation.isPending}
             size="icon"
             className="flex-shrink-0"
           >
