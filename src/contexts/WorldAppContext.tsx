@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from "@/hooks/use-toast";
+import { API_URL } from "@/config/config";
 
 interface WorldAppUser {
   id: string;
@@ -12,6 +12,7 @@ interface WorldAppUser {
 interface AppUser extends WorldAppUser{
 
   isSeller: boolean,
+  displayLocation?:string,
   rating?:number
 }
 
@@ -41,7 +42,7 @@ export const signInUser = async ({
   profilePictureUrl?: string;
 }, nonce: string) => {
   try {
-    const res = await fetch('https://marketplace-backend-sdl0.onrender.com/api/v1/signin', {
+    const res = await fetch(`${API_URL}/api/v1/signin`, {
       method: 'POST',
       credentials: "include",
       headers: { 'Content-Type': 'application/json' },
@@ -73,7 +74,6 @@ export const WorldAppProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [user, setUser] = useState<AppUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
     // Load user from localStorage or set default dev user
@@ -96,7 +96,8 @@ export const WorldAppProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             profilePictureUrl: data.profile_picture_url || undefined,
             isVerified: data.is_verified,
             isSeller: data.is_seller,
-            rating: data.rating
+            rating: data.rating,
+            displayLocation:data.display_location
           });
           setIsConnected(true);
           
@@ -123,6 +124,7 @@ export const WorldAppProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       .eq('id', userId)
       .single();
 
+
     if (data && !error) {
       setUser({
         id: data.id,
@@ -131,7 +133,8 @@ export const WorldAppProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         profilePictureUrl: data.profile_picture_url || undefined,
         isVerified: data.is_verified,
         isSeller:data.is_seller,
-        rating:data.rating
+        rating:data.rating,
+        displayLocation:data.display_location
 
       });
     }
@@ -157,11 +160,6 @@ export const WorldAppProvider: React.FC<{ children: React.ReactNode }> = ({ chil
    
       await fetchUserProfile(userId);
       setIsConnected(true);
-
-      toast({
-        title: "Connected!",
-        description: "Successfully connected with your wallet",
-      });
 
 
 

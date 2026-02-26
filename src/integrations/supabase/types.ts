@@ -475,7 +475,6 @@ export type Database = {
           id: string
           is_seller: boolean | null
           is_verified: boolean
-          name: string | null
           phone: string | null
           profile_picture_url: string | null
           rating: number | null
@@ -483,6 +482,7 @@ export type Database = {
           updated_at: string
           username: string | null
           wallet_address: string | null
+          world_app_username: string | null
         }
         Insert: {
           allow_phone_contact?: boolean | null
@@ -494,7 +494,6 @@ export type Database = {
           id?: string
           is_seller?: boolean | null
           is_verified?: boolean
-          name?: string | null
           phone?: string | null
           profile_picture_url?: string | null
           rating?: number | null
@@ -502,6 +501,7 @@ export type Database = {
           updated_at?: string
           username?: string | null
           wallet_address?: string | null
+          world_app_username?: string | null
         }
         Update: {
           allow_phone_contact?: boolean | null
@@ -513,7 +513,6 @@ export type Database = {
           id?: string
           is_seller?: boolean | null
           is_verified?: boolean
-          name?: string | null
           phone?: string | null
           profile_picture_url?: string | null
           rating?: number | null
@@ -521,6 +520,7 @@ export type Database = {
           updated_at?: string
           username?: string | null
           wallet_address?: string | null
+          world_app_username?: string | null
         }
         Relationships: []
       }
@@ -573,6 +573,7 @@ export type Database = {
           title: string | null
           updated_at: string | null
           views: number | null
+          world_app_username: string | null
         }
         Relationships: [
           {
@@ -601,6 +602,7 @@ export type Database = {
           profile_picture_url: string | null
           rating: number | null
           username: string | null
+          world_app_username: string | null
         }
         Insert: {
           country?: string | null
@@ -611,6 +613,7 @@ export type Database = {
           profile_picture_url?: string | null
           rating?: number | null
           username?: string | null
+          world_app_username?: string | null
         }
         Update: {
           country?: string | null
@@ -621,6 +624,7 @@ export type Database = {
           profile_picture_url?: string | null
           rating?: number | null
           username?: string | null
+          world_app_username?: string | null
         }
         Relationships: []
       }
