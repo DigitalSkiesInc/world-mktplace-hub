@@ -14,6 +14,7 @@ export interface Product {
     isVerified: boolean;
     phone?: string | null;
     allowPhoneContact?: boolean;
+    worldAppUsername?: string | null;
   };
   location: string;
   createdAt: string;

@@ -188,6 +188,7 @@ function transformDbProductToProduct(dbProduct: any): Product {
       username: dbProduct.seller_username,
       rating: dbProduct.sellers_rating,
       isVerified: dbProduct.sellers_is_verified,
+      worldAppUsername: dbProduct.world_app_username,
     },
     location: dbProduct.location,
     createdAt: dbProduct.created_at,

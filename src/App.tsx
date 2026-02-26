@@ -32,6 +32,8 @@ import AdminConfig from "./pages/admin/AdminConfig";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminListings from "./pages/admin/AdminListings";
 import AdminCategories from "./pages/admin/AdminCategories";
+import ReportProduct from "./pages/ReportProduct";
+import AdminReportDetail from "./pages/admin/AdminReportDetail";
 import { useUserRole } from "./hooks/useUserRole";
 
 
@@ -99,11 +101,13 @@ const App = () => (
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/buyer-guide" element={<BuyerGuide />} />
               <Route path="/safety-guidelines" element={<SafetyGuidelines />} />
+              <Route path="/report-product/:id" element={<ReportProduct />} />
               <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
               <Route path="/admin/config" element={<AdminRoute><AdminConfig /></AdminRoute>} />
               <Route path="/admin/payments" element={<AdminRoute><AdminPayments /></AdminRoute>} />
               <Route path="/admin/listings" element={<AdminRoute><AdminListings /></AdminRoute>} />
               <Route path="/admin/categories" element={<AdminRoute><AdminCategories /></AdminRoute>} />
+              <Route path="/admin/reports/:id" element={<AdminRoute><AdminReportDetail /></AdminRoute>} />
               </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
