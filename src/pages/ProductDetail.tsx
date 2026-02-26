@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share, MapPin, Star, Shield, MessageCircle, Phone, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Heart, Share, MapPin, Star, Shield, MessageCircle, Phone, ExternalLink, Flag } from 'lucide-react';
 import { useProduct } from '@/hooks/useProducts';
 import { useCreateConversation } from '@/hooks/useCreateConversation';
 import { useWorldApp } from '@/contexts/WorldAppContext';
@@ -356,7 +356,18 @@ const ProductDetail: React.FC = () => {
           </div>
         </div>
 
-
+        {/* Report button */}
+        <div className="px-4 py-1 flex justify-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground"
+            onClick={() => navigate(`/report-product/${id}`)}
+          >
+            <Flag size={14} className="mr-1" />
+            Report this product
+          </Button>
+        </div>
       </div>
 
       {/* Contact Seller Phone Dialog */}
